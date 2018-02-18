@@ -1,0 +1,16 @@
+Features:
+  ✔ sticky: boolean; @done (18-02-18 10:11)
+  ✔ raw: boolean = false; @done (18-02-18 10:11)
+  ☐ swappable: boolean = false;
+  ☐ sortable: boolean = false;
+  ☐ resizable: boolean = false;
+  ☐ filterable: boolean = false;
+  ☐ searchable: boolean = false;
+  ☐ editable: boolean = false;
+  ☐ expandable: boolean = false;
+  ☐ selectable: boolean = false;
+  ☐ readability: string|"border"|"even"|"odd" = undefined;
+  ☐ density: string|"comfortable"|"cozy"|"compact" = "comfortable";
+  ☐ pagination: boolean = false;
+  ☐ items: number = 50;
+  ☐ expandInto: string|"row"|"side-panel"|"dialog" = "row";

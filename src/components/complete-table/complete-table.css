@@ -423,8 +423,21 @@ complete-table .table .small {
 complete-table .table .draggable-mirror {
   width: inherit;
   flex: inherit;
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
 }
 
-complete-table .table .drag-handle {
+body.draggable--is-dragging {
+  cursor: -webkit-grabbing !important;
+  cursor: grabbing !important;
+}
 
+complete-table .table .drag-handle:hover {
+  cursor: -webkit-grab;
+  cursor: grab;
+}
+
+body.draggable--is-dragging complete-table .table .drag-handle {
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
 }

@@ -13,7 +13,7 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-var swappable = createCommonjsModule(function (module, exports) {
+var sortable = createCommonjsModule(function (module, exports) {
 (function webpackUniversalModuleDefinition(root, factory) {
 	module.exports = factory();
 })(commonjsGlobal, function() {
@@ -1033,13 +1033,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _Swappable = __webpack_require__(56);
+var _Sortable = __webpack_require__(56);
 
-var _Swappable2 = _interopRequireDefault(_Swappable);
+var _Sortable2 = _interopRequireDefault(_Sortable);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.default = _Swappable2.default;
+exports.default = _Sortable2.default;
 
 /***/ }),
 /* 56 */
@@ -1073,64 +1073,86 @@ var _Draggable2 = __webpack_require__(99);
 
 var _Draggable3 = _interopRequireDefault(_Draggable2);
 
-var _SwappableEvent = __webpack_require__(138);
+var _SortableEvent = __webpack_require__(138);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var onDragStart = Symbol('onDragStart');
+var onDragOverContainer = Symbol('onDragOverContainer');
 var onDragOver = Symbol('onDragOver');
 var onDragStop = Symbol('onDragStop');
 
 /**
- * Swappable is built on top of Draggable and allows swapping of draggable elements.
- * Order is irrelevant to Swappable.
- * @class Swappable
- * @module Swappable
+ * Sortable is built on top of Draggable and allows sorting of draggable elements. Sortable will keep
+ * track of the original index and emits the new index as you drag over draggable elements.
+ * @class Sortable
+ * @module Sortable
  * @extends Draggable
  */
 
-var Swappable = function (_Draggable) {
-  (0, _inherits3.default)(Swappable, _Draggable);
+var Sortable = function (_Draggable) {
+  (0, _inherits3.default)(Sortable, _Draggable);
 
   /**
-   * Swappable constructor.
-   * @constructs Swappable
-   * @param {HTMLElement[]|NodeList|HTMLElement} containers - Swappable containers
-   * @param {Object} options - Options for Swappable
+   * Sortable constructor.
+   * @constructs Sortable
+   * @param {HTMLElement[]|NodeList|HTMLElement} containers - Sortable containers
+   * @param {Object} options - Options for Sortable
    */
-  function Swappable() {
+  function Sortable() {
     var containers = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
     var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    (0, _classCallCheck3.default)(this, Swappable);
+    (0, _classCallCheck3.default)(this, Sortable);
 
     /**
-     * Last draggable element that was dragged over
-     * @property lastOver
-     * @type {HTMLElement}
+     * start index of source on drag start
+     * @property startIndex
+     * @type {Number}
      */
-    var _this = (0, _possibleConstructorReturn3.default)(this, (Swappable.__proto__ || Object.getPrototypeOf(Swappable)).call(this, containers, options));
+    var _this = (0, _possibleConstructorReturn3.default)(this, (Sortable.__proto__ || Object.getPrototypeOf(Sortable)).call(this, containers, options));
 
-    _this.lastOver = null;
+    _this.startIndex = null;
+
+    /**
+     * start container on drag start
+     * @property startContainer
+     * @type {HTMLElement}
+     * @default null
+     */
+    _this.startContainer = null;
 
     _this[onDragStart] = _this[onDragStart].bind(_this);
+    _this[onDragOverContainer] = _this[onDragOverContainer].bind(_this);
     _this[onDragOver] = _this[onDragOver].bind(_this);
     _this[onDragStop] = _this[onDragStop].bind(_this);
 
-    _this.on('drag:start', _this[onDragStart]).on('drag:over', _this[onDragOver]).on('drag:stop', _this[onDragStop]);
+    _this.on('drag:start', _this[onDragStart]).on('drag:over:container', _this[onDragOverContainer]).on('drag:over', _this[onDragOver]).on('drag:stop', _this[onDragStop]);
     return _this;
   }
 
   /**
-   * Destroys Swappable instance.
+   * Destroys Sortable instance.
    */
 
 
-  (0, _createClass3.default)(Swappable, [{
+  (0, _createClass3.default)(Sortable, [{
     key: 'destroy',
     value: function destroy() {
-      (0, _get3.default)(Swappable.prototype.__proto__ || Object.getPrototypeOf(Swappable.prototype), 'destroy', this).call(this);
+      (0, _get3.default)(Sortable.prototype.__proto__ || Object.getPrototypeOf(Sortable.prototype), 'destroy', this).call(this);
 
-      this.off('drag:start', this._onDragStart).off('drag:over', this._onDragOver).off('drag:stop', this._onDragStop);
+      this.off('drag:start', this[onDragStart]).off('drag:over:container', this[onDragOverContainer]).off('drag:over', this[onDragOver]).off('drag:stop', this[onDragStop]);
+    }
+
+    /**
+     * Returns true index of element within its container during drag operation, i.e. excluding mirror and original source
+     * @param {HTMLElement} element - An element
+     * @return {Number}
+     */
+
+  }, {
+    key: 'index',
+    value: function index(element) {
+      return this.getDraggableElementsForContainer(element.parentNode).indexOf(element);
     }
 
     /**
@@ -1142,15 +1164,75 @@ var Swappable = function (_Draggable) {
   }, {
     key: onDragStart,
     value: function value(event) {
-      var swappableStartEvent = new _SwappableEvent.SwappableStartEvent({
-        dragEvent: event
+      this.startContainer = event.source.parentNode;
+      this.startIndex = this.index(event.source);
+
+      var sortableStartEvent = new _SortableEvent.SortableStartEvent({
+        dragEvent: event,
+        startIndex: this.startIndex,
+        startContainer: this.startContainer
       });
 
-      this.trigger(swappableStartEvent);
+      this.trigger(sortableStartEvent);
 
-      if (swappableStartEvent.canceled()) {
+      if (sortableStartEvent.canceled()) {
         event.cancel();
       }
+    }
+
+    /**
+     * Drag over container handler
+     * @private
+     * @param {DragOverContainerEvent} event - Drag over container event
+     */
+
+  }, {
+    key: onDragOverContainer,
+    value: function value(event) {
+      if (event.canceled()) {
+        return;
+      }
+
+      var source = event.source,
+          over = event.over,
+          overContainer = event.overContainer;
+
+      var oldIndex = this.index(source);
+
+      var sortableSortEvent = new _SortableEvent.SortableSortEvent({
+        dragEvent: event,
+        currentIndex: oldIndex,
+        source: source,
+        over: over
+      });
+
+      this.trigger(sortableSortEvent);
+
+      if (sortableSortEvent.canceled()) {
+        return;
+      }
+
+      var children = this.getDraggableElementsForContainer(overContainer);
+      var moves = move({ source: source, over: over, overContainer: overContainer, children: children });
+
+      if (!moves) {
+        return;
+      }
+
+      var oldContainer = moves.oldContainer,
+          newContainer = moves.newContainer;
+
+      var newIndex = this.index(event.source);
+
+      var sortableSortedEvent = new _SortableEvent.SortableSortedEvent({
+        dragEvent: event,
+        oldIndex: oldIndex,
+        newIndex: newIndex,
+        oldContainer: oldContainer,
+        newContainer: newContainer
+      });
+
+      this.trigger(sortableSortedEvent);
     }
 
     /**
@@ -1162,41 +1244,50 @@ var Swappable = function (_Draggable) {
   }, {
     key: onDragOver,
     value: function value(event) {
-      if (event.over === event.originalSource || event.over === event.source || event.canceled()) {
+      if (event.over === event.originalSource || event.over === event.source) {
         return;
       }
 
-      var swappableSwapEvent = new _SwappableEvent.SwappableSwapEvent({
+      var source = event.source,
+          over = event.over,
+          overContainer = event.overContainer;
+
+      var oldIndex = this.index(source);
+
+      var sortableSortEvent = new _SortableEvent.SortableSortEvent({
         dragEvent: event,
-        over: event.over,
-        overContainer: event.overContainer
+        currentIndex: oldIndex,
+        source: source,
+        over: over
       });
 
-      this.trigger(swappableSwapEvent);
+      this.trigger(sortableSortEvent);
 
-      if (swappableSwapEvent.canceled()) {
+      if (sortableSortEvent.canceled()) {
         return;
       }
 
-      // swap originally swapped element back
-      if (this.lastOver && this.lastOver !== event.over) {
-        swap(this.lastOver, event.source);
+      var children = this.getDraggableElementsForContainer(overContainer);
+      var moves = move({ source: source, over: over, overContainer: overContainer, children: children });
+
+      if (!moves) {
+        return;
       }
 
-      if (this.lastOver === event.over) {
-        this.lastOver = null;
-      } else {
-        this.lastOver = event.over;
-      }
+      var oldContainer = moves.oldContainer,
+          newContainer = moves.newContainer;
 
-      swap(event.source, event.over);
+      var newIndex = this.index(source);
 
-      var swappableSwappedEvent = new _SwappableEvent.SwappableSwappedEvent({
+      var sortableSortedEvent = new _SortableEvent.SortableSortedEvent({
         dragEvent: event,
-        swappedElement: event.over
+        oldIndex: oldIndex,
+        newIndex: newIndex,
+        oldContainer: oldContainer,
+        newContainer: newContainer
       });
 
-      this.trigger(swappableSwappedEvent);
+      this.trigger(sortableSortedEvent);
     }
 
     /**
@@ -1208,35 +1299,83 @@ var Swappable = function (_Draggable) {
   }, {
     key: onDragStop,
     value: function value(event) {
-      var swappableStopEvent = new _SwappableEvent.SwappableStopEvent({
-        dragEvent: event
+      var sortableStopEvent = new _SortableEvent.SortableStopEvent({
+        dragEvent: event,
+        oldIndex: this.startIndex,
+        newIndex: this.index(event.source),
+        oldContainer: this.startContainer,
+        newContainer: event.source.parentNode
       });
 
-      this.trigger(swappableStopEvent);
-      this.lastOver = null;
+      this.trigger(sortableStopEvent);
+
+      this.startIndex = null;
+      this.startContainer = null;
     }
   }]);
-  return Swappable;
+  return Sortable;
 }(_Draggable3.default);
 
-exports.default = Swappable;
+exports.default = Sortable;
 
 
-function withTempElement(callback) {
-  var tmpElement = document.createElement('div');
-  callback(tmpElement);
-  tmpElement.parentNode.removeChild(tmpElement);
+function index(element) {
+  return Array.prototype.indexOf.call(element.parentNode.children, element);
 }
 
-function swap(source, over) {
-  var overParent = over.parentNode;
-  var sourceParent = source.parentNode;
+function move(_ref) {
+  var source = _ref.source,
+      over = _ref.over,
+      overContainer = _ref.overContainer,
+      children = _ref.children;
 
-  withTempElement(function (tmpElement) {
-    sourceParent.insertBefore(tmpElement, source);
-    overParent.insertBefore(source, over);
-    sourceParent.insertBefore(over, tmpElement);
-  });
+  var emptyOverContainer = !children.length;
+  var differentContainer = source.parentNode !== overContainer;
+  var sameContainer = over && !differentContainer;
+
+  if (emptyOverContainer) {
+    return moveInsideEmptyContainer(source, overContainer);
+  } else if (sameContainer) {
+    return moveWithinContainer(source, over);
+  } else if (differentContainer) {
+    return moveOutsideContainer(source, over, overContainer);
+  } else {
+    return null;
+  }
+}
+
+function moveInsideEmptyContainer(source, overContainer) {
+  var oldContainer = source.parentNode;
+
+  overContainer.appendChild(source);
+
+  return { oldContainer: oldContainer, newContainer: overContainer };
+}
+
+function moveWithinContainer(source, over) {
+  var oldIndex = index(source);
+  var newIndex = index(over);
+
+  if (oldIndex < newIndex) {
+    source.parentNode.insertBefore(source, over.nextElementSibling);
+  } else {
+    source.parentNode.insertBefore(source, over);
+  }
+
+  return { oldContainer: source.parentNode, newContainer: source.parentNode };
+}
+
+function moveOutsideContainer(source, over, overContainer) {
+  var oldContainer = source.parentNode;
+
+  if (over) {
+    over.parentNode.insertBefore(source, over);
+  } else {
+    // need to figure out proper position
+    overContainer.appendChild(source);
+  }
+
+  return { oldContainer: oldContainer, newContainer: source.parentNode };
 }
 
 /***/ }),
@@ -6735,30 +6874,30 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _SwappableEvent = __webpack_require__(139);
+var _SortableEvent = __webpack_require__(139);
 
-Object.defineProperty(exports, 'SwappableStartEvent', {
+Object.defineProperty(exports, 'SortableStartEvent', {
   enumerable: true,
   get: function get() {
-    return _SwappableEvent.SwappableStartEvent;
+    return _SortableEvent.SortableStartEvent;
   }
 });
-Object.defineProperty(exports, 'SwappableSwapEvent', {
+Object.defineProperty(exports, 'SortableSortEvent', {
   enumerable: true,
   get: function get() {
-    return _SwappableEvent.SwappableSwapEvent;
+    return _SortableEvent.SortableSortEvent;
   }
 });
-Object.defineProperty(exports, 'SwappableSwappedEvent', {
+Object.defineProperty(exports, 'SortableSortedEvent', {
   enumerable: true,
   get: function get() {
-    return _SwappableEvent.SwappableSwappedEvent;
+    return _SortableEvent.SortableSortedEvent;
   }
 });
-Object.defineProperty(exports, 'SwappableStopEvent', {
+Object.defineProperty(exports, 'SortableStopEvent', {
   enumerable: true,
   get: function get() {
-    return _SwappableEvent.SwappableStopEvent;
+    return _SortableEvent.SortableStopEvent;
   }
 });
 
@@ -6769,7 +6908,7 @@ Object.defineProperty(exports, 'SwappableStopEvent', {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SwappableStopEvent = exports.SwappableSwappedEvent = exports.SwappableSwapEvent = exports.SwappableStartEvent = exports.SwappableEvent = undefined;
+exports.SortableStopEvent = exports.SortableSortedEvent = exports.SortableSortEvent = exports.SortableStartEvent = exports.SortableEvent = undefined;
 
 var _classCallCheck2 = __webpack_require__(0);
 
@@ -6794,25 +6933,25 @@ var _AbstractEvent3 = _interopRequireDefault(_AbstractEvent2);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * Base swappable event
- * @class SwappableEvent
- * @module SwappableEvent
+ * Base sortable event
+ * @class SortableEvent
+ * @module SortableEvent
  * @extends AbstractEvent
  */
-var SwappableEvent = exports.SwappableEvent = function (_AbstractEvent) {
-  (0, _inherits3.default)(SwappableEvent, _AbstractEvent);
+var SortableEvent = exports.SortableEvent = function (_AbstractEvent) {
+  (0, _inherits3.default)(SortableEvent, _AbstractEvent);
 
-  function SwappableEvent() {
-    (0, _classCallCheck3.default)(this, SwappableEvent);
-    return (0, _possibleConstructorReturn3.default)(this, (SwappableEvent.__proto__ || Object.getPrototypeOf(SwappableEvent)).apply(this, arguments));
+  function SortableEvent() {
+    (0, _classCallCheck3.default)(this, SortableEvent);
+    return (0, _possibleConstructorReturn3.default)(this, (SortableEvent.__proto__ || Object.getPrototypeOf(SortableEvent)).apply(this, arguments));
   }
 
-  (0, _createClass3.default)(SwappableEvent, [{
+  (0, _createClass3.default)(SortableEvent, [{
     key: 'dragEvent',
 
 
     /**
-     * Original drag event that triggered this swappable event
+     * Original drag event that triggered this sortable event
      * @property dragEvent
      * @type {DragEvent}
      * @readonly
@@ -6821,65 +6960,105 @@ var SwappableEvent = exports.SwappableEvent = function (_AbstractEvent) {
       return this.data.dragEvent;
     }
   }]);
-  return SwappableEvent;
+  return SortableEvent;
 }(_AbstractEvent3.default);
 
 /**
- * Swappable start event
- * @class SwappableStartEvent
- * @module SwappableStartEvent
- * @extends SwappableEvent
+ * Sortable start event
+ * @class SortableStartEvent
+ * @module SortableStartEvent
+ * @extends SortableEvent
  */
 
 
-SwappableEvent.type = 'swappable';
+SortableEvent.type = 'sortable';
 
-var SwappableStartEvent = exports.SwappableStartEvent = function (_SwappableEvent) {
-  (0, _inherits3.default)(SwappableStartEvent, _SwappableEvent);
+var SortableStartEvent = exports.SortableStartEvent = function (_SortableEvent) {
+  (0, _inherits3.default)(SortableStartEvent, _SortableEvent);
 
-  function SwappableStartEvent() {
-    (0, _classCallCheck3.default)(this, SwappableStartEvent);
-    return (0, _possibleConstructorReturn3.default)(this, (SwappableStartEvent.__proto__ || Object.getPrototypeOf(SwappableStartEvent)).apply(this, arguments));
+  function SortableStartEvent() {
+    (0, _classCallCheck3.default)(this, SortableStartEvent);
+    return (0, _possibleConstructorReturn3.default)(this, (SortableStartEvent.__proto__ || Object.getPrototypeOf(SortableStartEvent)).apply(this, arguments));
   }
 
-  return SwappableStartEvent;
-}(SwappableEvent);
-
-/**
- * Swappable swap event
- * @class SwappableSwapEvent
- * @module SwappableSwapEvent
- * @extends SwappableEvent
- */
-
-
-SwappableStartEvent.type = 'swappable:start';
-SwappableStartEvent.cancelable = true;
-
-var SwappableSwapEvent = exports.SwappableSwapEvent = function (_SwappableEvent2) {
-  (0, _inherits3.default)(SwappableSwapEvent, _SwappableEvent2);
-
-  function SwappableSwapEvent() {
-    (0, _classCallCheck3.default)(this, SwappableSwapEvent);
-    return (0, _possibleConstructorReturn3.default)(this, (SwappableSwapEvent.__proto__ || Object.getPrototypeOf(SwappableSwapEvent)).apply(this, arguments));
-  }
-
-  (0, _createClass3.default)(SwappableSwapEvent, [{
-    key: 'over',
+  (0, _createClass3.default)(SortableStartEvent, [{
+    key: 'startIndex',
 
 
     /**
-     * Draggable element you are over
+     * Start index of source on sortable start
+     * @property startIndex
+     * @type {Number}
+     * @readonly
+     */
+    get: function get() {
+      return this.data.startIndex;
+    }
+
+    /**
+     * Start container on sortable start
+     * @property startContainer
+     * @type {HTMLElement}
+     * @readonly
+     */
+
+  }, {
+    key: 'startContainer',
+    get: function get() {
+      return this.data.startContainer;
+    }
+  }]);
+  return SortableStartEvent;
+}(SortableEvent);
+
+/**
+ * Sortable sort event
+ * @class SortableSortEvent
+ * @module SortableSortEvent
+ * @extends SortableEvent
+ */
+
+
+SortableStartEvent.type = 'sortable:start';
+SortableStartEvent.cancelable = true;
+
+var SortableSortEvent = exports.SortableSortEvent = function (_SortableEvent2) {
+  (0, _inherits3.default)(SortableSortEvent, _SortableEvent2);
+
+  function SortableSortEvent() {
+    (0, _classCallCheck3.default)(this, SortableSortEvent);
+    return (0, _possibleConstructorReturn3.default)(this, (SortableSortEvent.__proto__ || Object.getPrototypeOf(SortableSortEvent)).apply(this, arguments));
+  }
+
+  (0, _createClass3.default)(SortableSortEvent, [{
+    key: 'currentIndex',
+
+
+    /**
+     * Index of current draggable element
+     * @property currentIndex
+     * @type {Number}
+     * @readonly
+     */
+    get: function get() {
+      return this.data.currentIndex;
+    }
+
+    /**
+     * Draggable element you are hovering over
      * @property over
      * @type {HTMLElement}
      * @readonly
      */
+
+  }, {
+    key: 'over',
     get: function get() {
-      return this.data.over;
+      return this.data.oldIndex;
     }
 
     /**
-     * Draggable container you are over
+     * Draggable container element you are hovering over
      * @property overContainer
      * @type {HTMLElement}
      * @readonly
@@ -6888,82 +7067,173 @@ var SwappableSwapEvent = exports.SwappableSwapEvent = function (_SwappableEvent2
   }, {
     key: 'overContainer',
     get: function get() {
-      return this.data.overContainer;
+      return this.data.newIndex;
     }
   }]);
-  return SwappableSwapEvent;
-}(SwappableEvent);
+  return SortableSortEvent;
+}(SortableEvent);
 
 /**
- * Swappable swapped event
- * @class SwappableSwappedEvent
- * @module SwappableSwappedEvent
- * @extends SwappableEvent
+ * Sortable sorted event
+ * @class SortableSortedEvent
+ * @module SortableSortedEvent
+ * @extends SortableEvent
  */
 
 
-SwappableSwapEvent.type = 'swappable:swap';
-SwappableSwapEvent.cancelable = true;
+SortableSortEvent.type = 'sortable:sort';
+SortableSortEvent.cancelable = true;
 
-var SwappableSwappedEvent = exports.SwappableSwappedEvent = function (_SwappableEvent3) {
-  (0, _inherits3.default)(SwappableSwappedEvent, _SwappableEvent3);
+var SortableSortedEvent = exports.SortableSortedEvent = function (_SortableEvent3) {
+  (0, _inherits3.default)(SortableSortedEvent, _SortableEvent3);
 
-  function SwappableSwappedEvent() {
-    (0, _classCallCheck3.default)(this, SwappableSwappedEvent);
-    return (0, _possibleConstructorReturn3.default)(this, (SwappableSwappedEvent.__proto__ || Object.getPrototypeOf(SwappableSwappedEvent)).apply(this, arguments));
+  function SortableSortedEvent() {
+    (0, _classCallCheck3.default)(this, SortableSortedEvent);
+    return (0, _possibleConstructorReturn3.default)(this, (SortableSortedEvent.__proto__ || Object.getPrototypeOf(SortableSortedEvent)).apply(this, arguments));
   }
 
-  (0, _createClass3.default)(SwappableSwappedEvent, [{
-    key: 'swappedElement',
+  (0, _createClass3.default)(SortableSortedEvent, [{
+    key: 'oldIndex',
 
 
     /**
-     * The draggable element that you swapped with
-     * @property swappedElement
-     * @type {HTMLElement}
+     * Index of last sorted event
+     * @property oldIndex
+     * @type {Number}
      * @readonly
      */
     get: function get() {
-      return this.data.swappedElement;
+      return this.data.oldIndex;
+    }
+
+    /**
+     * New index of this sorted event
+     * @property newIndex
+     * @type {Number}
+     * @readonly
+     */
+
+  }, {
+    key: 'newIndex',
+    get: function get() {
+      return this.data.newIndex;
+    }
+
+    /**
+     * Old container of draggable element
+     * @property oldContainer
+     * @type {HTMLElement}
+     * @readonly
+     */
+
+  }, {
+    key: 'oldContainer',
+    get: function get() {
+      return this.data.oldContainer;
+    }
+
+    /**
+     * New container of draggable element
+     * @property newContainer
+     * @type {HTMLElement}
+     * @readonly
+     */
+
+  }, {
+    key: 'newContainer',
+    get: function get() {
+      return this.data.newContainer;
     }
   }]);
-  return SwappableSwappedEvent;
-}(SwappableEvent);
+  return SortableSortedEvent;
+}(SortableEvent);
 
 /**
- * Swappable stop event
- * @class SwappableStopEvent
- * @module SwappableStopEvent
- * @extends SwappableEvent
+ * Sortable stop event
+ * @class SortableStopEvent
+ * @module SortableStopEvent
+ * @extends SortableEvent
  */
 
 
-SwappableSwappedEvent.type = 'swappable:swapped';
+SortableSortedEvent.type = 'sortable:sorted';
 
-var SwappableStopEvent = exports.SwappableStopEvent = function (_SwappableEvent4) {
-  (0, _inherits3.default)(SwappableStopEvent, _SwappableEvent4);
+var SortableStopEvent = exports.SortableStopEvent = function (_SortableEvent4) {
+  (0, _inherits3.default)(SortableStopEvent, _SortableEvent4);
 
-  function SwappableStopEvent() {
-    (0, _classCallCheck3.default)(this, SwappableStopEvent);
-    return (0, _possibleConstructorReturn3.default)(this, (SwappableStopEvent.__proto__ || Object.getPrototypeOf(SwappableStopEvent)).apply(this, arguments));
+  function SortableStopEvent() {
+    (0, _classCallCheck3.default)(this, SortableStopEvent);
+    return (0, _possibleConstructorReturn3.default)(this, (SortableStopEvent.__proto__ || Object.getPrototypeOf(SortableStopEvent)).apply(this, arguments));
   }
 
-  return SwappableStopEvent;
-}(SwappableEvent);
+  (0, _createClass3.default)(SortableStopEvent, [{
+    key: 'oldIndex',
 
-SwappableStopEvent.type = 'swappable:stop';
+
+    /**
+     * Original index on sortable start
+     * @property oldIndex
+     * @type {Number}
+     * @readonly
+     */
+    get: function get() {
+      return this.data.oldIndex;
+    }
+
+    /**
+     * New index of draggable element
+     * @property newIndex
+     * @type {Number}
+     * @readonly
+     */
+
+  }, {
+    key: 'newIndex',
+    get: function get() {
+      return this.data.newIndex;
+    }
+
+    /**
+     * Original container of draggable element
+     * @property oldContainer
+     * @type {HTMLElement}
+     * @readonly
+     */
+
+  }, {
+    key: 'oldContainer',
+    get: function get() {
+      return this.data.oldContainer;
+    }
+
+    /**
+     * New container of draggable element
+     * @property newContainer
+     * @type {HTMLElement}
+     * @readonly
+     */
+
+  }, {
+    key: 'newContainer',
+    get: function get() {
+      return this.data.newContainer;
+    }
+  }]);
+  return SortableStopEvent;
+}(SortableEvent);
+
+SortableStopEvent.type = 'sortable:stop';
 
 /***/ })
 /******/ ]);
 });
 });
 
-var Swappable = unwrapExports(swappable);
+var Sortable = unwrapExports(sortable);
 
 class CompleteTable {
     constructor() {
         this.raw = false;
-        this.swappable = false;
         this.sortable = false;
         this.resizable = false;
         this.filterable = false;
@@ -6976,6 +7246,11 @@ class CompleteTable {
         this.pagination = false;
         this.items = 50;
         this.expandInto = "row";
+        this.columns = [];
+        this.data = {
+            version: 0,
+            list: []
+        };
     }
     componentWillLoad() {
         var table = this.element.querySelector('table');
@@ -6984,15 +7259,31 @@ class CompleteTable {
         }
     }
     componentDidLoad() {
-        if (this.swappable) {
-            const swappable$$1 = new Swappable(this.element.querySelector('.tbody'), {
+        this.observeSortable(this.sortable);
+    }
+    observeSortable(value) {
+        if (value) {
+            this.initSortable();
+        }
+        else {
+            this.destroySortable();
+        }
+    }
+    initSortable() {
+        if (this.sortable) {
+            this.__sortable = new Sortable(this.element.querySelector('.tbody'), {
                 draggable: '.tr',
                 handle: '.drag-handle'
             });
-            swappable$$1.on('swappable:start', () => console.log('swappable:start'));
-            swappable$$1.on('swappable:swapped', () => console.log('swappable:swapped'));
-            swappable$$1.on('swappable:stop', () => console.log('swappable:stop'));
-            console.log(swappable$$1.getDraggableElementsForContainer());
+            this.__sortable.on('sortable:stop', () => { this.updateDataOnSort(); });
+        }
+    }
+    updateDataOnSort() {
+        this.gatherData(this.element);
+    }
+    destroySortable() {
+        if (!this.sortable && this.__sortable) {
+            this.__sortable.destroy();
         }
     }
     state() {
@@ -7015,41 +7306,42 @@ class CompleteTable {
         this.columns = columns;
     }
     gatherData(table) {
-        var data = Array.prototype.map.call(table.querySelectorAll('tbody tr'), (tr) => {
-            return Array.prototype.map.call(tr.querySelectorAll('td,th'), (td) => {
+        var list = Array.prototype.map.call(table.querySelectorAll('tbody tr, .tbody .tr:not(.draggable--original):not(.draggable-mirror)'), (tr) => {
+            return Array.prototype.map.call(tr.querySelectorAll('td:not(.ignore),th:not(.ignore),.td:not(.ignore),.th:not(.ignore)'), (td) => {
                 return this.sanitizeTD(td);
             });
         });
-        this.data = data;
+        this.data = {
+            version: this.data.version + 1,
+            list: list
+        };
     }
     sanitizeHeadTD(element) {
         return {
-            content: element.innerHTML,
-            name: element.id,
-            id: element.id
+            content: element.innerHTML
         };
     }
     sanitizeTD(element) {
         return {
             content: element.innerHTML,
-            name: element.id,
-            id: element.id
+            name: element.dataset.name,
+            id: element.parentNode.dataset.id
         };
     }
     // Render Methods
     renderDragTab() {
-        return (h("div", { class: "td small" },
+        return (h("div", { class: "td small ignore" },
             h("button", { class: "drag-handle" })));
     }
     renderSelectColumn() {
-        return (h("div", { class: "td small" },
+        return (h("div", { class: "td small ignore" },
             h("input", { type: "checkbox", onChange: () => { console.log('Select one item'); } })));
     }
     renderHeaderDragTab() {
-        return (h("div", { class: "th small" }));
+        return (h("div", { class: "th small ignore" }));
     }
     renderHeaderSelectColumn() {
-        return (h("div", { class: "th small" },
+        return (h("div", { class: "th small ignore" },
             h("input", { type: "checkbox", onChange: () => { console.log('Select all'); } })));
     }
     renderTableHead() {
@@ -7059,7 +7351,7 @@ class CompleteTable {
     }
     renderTableHeadRow(row) {
         return (h("div", { class: "tr" },
-            this.swappable && this.renderHeaderDragTab(),
+            this.sortable && this.renderHeaderDragTab(),
             this.selectable && this.renderHeaderSelectColumn(),
             row.map((row) => {
                 return this.renderTableHeadColumnName(row);
@@ -7069,20 +7361,20 @@ class CompleteTable {
         return (h("div", { class: "th", innerHTML: this.raw ? item.content : undefined }, !this.raw ? item.content : undefined));
     }
     renderTableBody() {
-        return (h("div", { class: "tbody" }, this.data.map((row, index) => {
+        return (h("div", { class: "tbody" }, this.data.list.map((row, index) => {
             return this.renderTableRow(row, index);
         })));
     }
     renderTableRow(row, index) {
-        return (h("div", { class: "tr", "data-index": index },
-            this.swappable && this.renderDragTab(),
+        return (h("div", { class: "tr", "data-index": index, "data-version": this.data.version },
+            this.sortable && this.renderDragTab(),
             this.selectable && this.renderSelectColumn(),
-            row.map((row) => {
-                return this.renderTableCell(row);
+            row.map((item, index) => {
+                return this.renderTableCell(item, index);
             })));
     }
-    renderTableCell(item) {
-        return (h("div", { class: "td", innerHTML: this.raw ? item.content : undefined }, !this.raw ? item.content : undefined));
+    renderTableCell(item, index) {
+        return (h("div", { class: "td", "data-index": index, innerHTML: this.raw ? item.content : undefined }, !this.raw ? item.content : undefined));
     }
     render() {
         return (h("div", { class: "table" },
@@ -7090,8 +7382,8 @@ class CompleteTable {
             this.renderTableBody()));
     }
     static get is() { return "complete-table"; }
-    static get properties() { return { "columns": { "state": true }, "data": { "state": true }, "density": { "type": "Any", "attr": "density" }, "editable": { "type": Boolean, "attr": "editable" }, "element": { "elementRef": true }, "expandable": { "type": Boolean, "attr": "expandable" }, "expandInto": { "type": "Any", "attr": "expand-into" }, "filterable": { "type": Boolean, "attr": "filterable" }, "items": { "type": Number, "attr": "items" }, "pagination": { "type": Boolean, "attr": "pagination" }, "raw": { "type": Boolean, "attr": "raw" }, "readability": { "type": "Any", "attr": "readability" }, "resizable": { "type": Boolean, "attr": "resizable" }, "searchable": { "type": Boolean, "attr": "searchable" }, "selectable": { "type": Boolean, "attr": "selectable" }, "sortable": { "type": Boolean, "attr": "sortable" }, "state": { "method": true }, "sticky": { "type": Boolean, "attr": "sticky" }, "swappable": { "type": Boolean, "attr": "swappable" } }; }
-    static get style() { return "complete-table {\n  --table-border-color: rgba(0,0,0,0.2);\n  --table-box-shadow: rgba(0,0,0,0.15);\n  --table-font-size: 1.6rem;\n  display: block;\n  box-sizing: border-box;\n}\n\ncomplete-table table {\n  display: none;\n}\n\ncomplete-table * {\n  box-sizing: border-box;\n}\n\ncomplete-table .table {\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  border: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .table {\n  flex: auto 1;\n  display: flex;\n  flex-direction: column;\n  align-items: stretch;\n  width: 100%;\n  border-collapse: collapse;\n  overflow: auto;\n}\n\ncomplete-table .table .thead {\n  flex: 1 0 auto;\n  display: flex;\n  flex-direction: column;\n  -webkit-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n\ncomplete-table .table .thead.-headerGroups {\n  background: rgba(0,0,0,0.03);\n  border-bottom: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .thead.-filters {\n  border-bottom: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .thead.-filters input,\ncomplete-table .table .thead.-filters select {\n  border: 1px solid var(--table-border-color);\n  background: #fff;\n  padding: 5px 7px;\n  font-size: inherit;\n  border-radius: 3px;\n  font-weight: normal;\n  outline: none;\n}\n\ncomplete-table .table .thead.-filters .th {\n  border-right: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .thead.-header {\n  box-shadow: 0 2px 15px 0px var(--table-box-shadow);\n}\n\ncomplete-table .table .thead .tr {\n  text-align: center;\n}\n\ncomplete-table .table .thead .th,\ncomplete-table .table .thead .td {\n  padding: 5px 5px;\n  line-height: normal;\n  position: relative;\n  border-right: 1px solid var(--table-border-color);\n  transition: box-shadow 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);\n  box-shadow: inset 0 0 0 0 transparent;\n}\n\ncomplete-table .table .thead .th.-soasc,\ncomplete-table .table .thead .td.-soasc {\n  box-shadow: inset 0 3px 0 0 var(--table-box-shadow);\n}\n\ncomplete-table .table .thead .th.-sodesc,\ncomplete-table .table .thead .td.-sodesc {\n  box-shadow: inset 0 -3px 0 0 var(--table-box-shadow);\n}\n\ncomplete-table .table .thead .th.-cursor-pointer,\ncomplete-table .table .thead .td.-cursor-pointer {\n  cursor: pointer;\n}\n\ncomplete-table .table .thead .th:last-child,\ncomplete-table .table .thead .td:last-child {\n  border-right: 0;\n}\n\ncomplete-table .table .thead .resizable-header {\n  overflow: visible;\n}\n\ncomplete-table .table .thead .resizable-header:last-child {\n  overflow: hidden;\n}\n\ncomplete-table .table .thead .resizable-header-content {\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n\ncomplete-table .table .thead .header-pivot {\n  border-right-color: var(--table-border-color);\n}\n\ncomplete-table .table .thead .header-pivot::after,\ncomplete-table .table .thead .header-pivot::before {\n  left: 100%;\n  top: 50%;\n  border: solid transparent;\n  content: \" \";\n  height: 0;\n  width: 0;\n  position: absolute;\n  pointer-events: none;\n}\n\ncomplete-table .table .thead .header-pivot::after {\n  border-color: rgba(255,255,255,0);\n  border-left-color: #fff;\n  border-width: 8px;\n  margin-top: -8px;\n}\n\ncomplete-table .table .thead .header-pivot::before {\n  border-color: rgba(102,102,102,0);\n  border-left-color: var(--table-border-color);\n  border-width: 10px;\n  margin-top: -10px;\n}\n\ncomplete-table .table .tbody {\n  flex: 99999 1 auto;\n  display: flex;\n  flex-direction: column;\n  overflow: auto;\n}\n\ncomplete-table .table .tbody .tr-group {\n  border-bottom: solid 1px var(--table-border-color);\n}\n\ncomplete-table .table .tbody .tr-group:last-child {\n  border-bottom: 0;\n}\n\ncomplete-table .table .tbody .td {\n  border-right: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .tbody .td:last-child {\n  border-right: 0;\n}\n\ncomplete-table .table .tbody .expandable {\n  cursor: pointer;\n}\n\ncomplete-table .table .tr-group {\n  flex: 1 0 auto;\n  display: flex;\n  flex-direction: column;\n  align-items: stretch;\n}\n\ncomplete-table .table .tr {\n  flex: 1 0 auto;\n  display: inline-flex;\n}\n\ncomplete-table .table .th,\ncomplete-table .table .td {\n  flex: 1 0 0px;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  padding: 7px 5px;\n  overflow: hidden;\n  transition: 0.3s ease;\n  transition-property: width, min-width, padding, opacity;\n  font-size: var(--font-size);\n}\n\ncomplete-table .table .th.-hidden,\ncomplete-table .table .td.-hidden {\n  width: 0 !important;\n  min-width: 0 !important;\n  padding: 0 !important;\n  border: 0 !important;\n  opacity: 0 !important;\n}\n\ncomplete-table .table .expander {\n  display: inline-block;\n  position: relative;\n  margin: 0;\n  color: transparent;\n  margin: 0 10px;\n}\n\ncomplete-table .table .expander::after {\n  content: '';\n  position: absolute;\n  width: 0;\n  height: 0;\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%) rotate(-90deg);\n  border-left: 5.04px solid transparent;\n  border-right: 5.04px solid transparent;\n  border-top: 7px solid var(--table-border-color);\n  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);\n  cursor: pointer;\n}\n\ncomplete-table .table .expander.-open::after {\n  transform: translate(-50%, -50%) rotate(0deg);\n}\n\ncomplete-table .table .resizer {\n  display: inline-block;\n  position: absolute;\n  width: 36px;\n  top: 0;\n  bottom: 0;\n  right: -18px;\n  cursor: col-resize;\n  z-index: 10;\n}\n\ncomplete-table .table .tfoot {\n  flex: 1 0 auto;\n  display: flex;\n  flex-direction: column;\n  box-shadow: 0 0px 15px 0px rgba(0,0,0,0.15);\n}\n\ncomplete-table .table .tfoot .td {\n  border-right: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .tfoot .td:last-child {\n  border-right: 0;\n}\n\ncomplete-table .table.-striped .tr.-odd {\n  background: rgba(0,0,0,0.03);\n}\n\ncomplete-table .table.-highlight .tbody .tr:not(.-padRow):hover {\n  background: rgba(0,0,0,0.05);\n}\n\ncomplete-table .table .-pagination {\n  z-index: 1;\n  display: flex;\n  justify-content: space-between;\n  align-items: stretch;\n  flex-wrap: wrap;\n  padding: 3px;\n  box-shadow: 0 0px 15px 0px rgba(0,0,0,0.1);\n  border-top: 2px solid var(--table-border-color);\n}\n\ncomplete-table .table .-pagination input,\ncomplete-table .table .-pagination select {\n  border: 1px solid var(--table-border-color);\n  background: #fff;\n  padding: 5px 7px;\n  font-size: inherit;\n  border-radius: 3px;\n  font-weight: normal;\n  outline: none;\n}\n\ncomplete-table .table .-pagination .-btn {\n  appearance: none;\n  display: block;\n  width: 100%;\n  height: 100%;\n  border: 0;\n  border-radius: 3px;\n  padding: 6px;\n  font-size: 1em;\n  color: rgba(0,0,0,0.6);\n  background: rgba(0,0,0,0.1);\n  transition: all 0.1s ease;\n  cursor: pointer;\n  outline: none;\n}\n\ncomplete-table .table .-pagination .-btn[disabled] {\n  opacity: 0.5;\n  cursor: default;\n}\n\ncomplete-table .table .-pagination .-btn:not([disabled]):hover {\n  background: rgba(0,0,0,0.3);\n  color: #fff;\n}\n\ncomplete-table .table .-pagination .-previous,\ncomplete-table .table .-pagination .-next {\n  flex: 1;\n  text-align: center;\n}\n\ncomplete-table .table .-pagination .-center {\n  flex: 1.5;\n  text-align: center;\n  margin-bottom: 0;\n  display: flex;\n  flex-direction: row;\n  flex-wrap: wrap;\n  align-items: center;\n  justify-content: space-around;\n}\n\ncomplete-table .table .-pagination .-pageInfo {\n  display: inline-block;\n  margin: 3px 10px;\n  white-space: nowrap;\n}\n\ncomplete-table .table .-pagination .-pageJump {\n  display: inline-block;\n}\n\ncomplete-table .table .-pagination .-pageJump input {\n  width: 70px;\n  text-align: center;\n}\n\ncomplete-table .table .-pagination .-pageSizeOptions {\n  margin: 3px 10px;\n}\n\ncomplete-table .table .noData {\n  display: block;\n  position: absolute;\n  left: 50%;\n  top: 50%;\n  transform: translate(-50%, -50%);\n  background: rgba(255,255,255,0.8);\n  transition: all 0.3s ease;\n  z-index: 1;\n  pointer-events: none;\n  padding: 20px;\n  color: rgba(0,0,0,0.5);\n}\n\ncomplete-table .table .-loading {\n  display: block;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  background: rgba(255,255,255,0.8);\n  transition: all 0.3s ease;\n  z-index: -1;\n  opacity: 0;\n  pointer-events: none;\n}\n\ncomplete-table .table .-loading > div {\n  position: absolute;\n  display: block;\n  text-align: center;\n  width: 100%;\n  top: 50%;\n  left: 0;\n  font-size: 15px;\n  color: rgba(0,0,0,0.6);\n  transform: translateY(-52%);\n  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);\n}\n\ncomplete-table .table .-loading.-active {\n  opacity: 1;\n  z-index: 2;\n  pointer-events: all;\n}\n\ncomplete-table .table .-loading.-active > div {\n  transform: translateY(50%);\n}\n\ncomplete-table .table .resizing .th,\ncomplete-table .table .resizing .td {\n  transition: none !important;\n  cursor: col-resize;\n  user-select: none;\n}\n\ncomplete-table[sticky] .thead {\n  position: sticky;\n  top: 0;\n  background: white;\n}\n\ncomplete-table .table .small {\n  flex: 0 0 0px;\n  min-width: 28px;\n}\n\ncomplete-table .table .draggable-mirror {\n  width: inherit;\n  flex: inherit;\n}\n\ncomplete-table .table .drag-handle {\n\n}"; }
+    static get properties() { return { "__sortable": { "state": true }, "columns": { "state": true }, "data": { "state": true }, "density": { "type": "Any", "attr": "density" }, "editable": { "type": Boolean, "attr": "editable" }, "element": { "elementRef": true }, "expandable": { "type": Boolean, "attr": "expandable" }, "expandInto": { "type": "Any", "attr": "expand-into" }, "filterable": { "type": Boolean, "attr": "filterable" }, "items": { "type": Number, "attr": "items" }, "pagination": { "type": Boolean, "attr": "pagination" }, "raw": { "type": Boolean, "attr": "raw" }, "readability": { "type": "Any", "attr": "readability" }, "resizable": { "type": Boolean, "attr": "resizable" }, "searchable": { "type": Boolean, "attr": "searchable" }, "selectable": { "type": Boolean, "attr": "selectable" }, "sortable": { "type": Boolean, "attr": "sortable", "watchCallbacks": ["observeSortable"] }, "state": { "method": true }, "sticky": { "type": Boolean, "attr": "sticky" } }; }
+    static get style() { return "complete-table {\n  --table-border-color: rgba(0,0,0,0.2);\n  --table-box-shadow: rgba(0,0,0,0.15);\n  --table-font-size: 1.6rem;\n  display: block;\n  box-sizing: border-box;\n}\n\ncomplete-table table {\n  display: none;\n}\n\ncomplete-table * {\n  box-sizing: border-box;\n}\n\ncomplete-table .table {\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  border: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .table {\n  flex: auto 1;\n  display: flex;\n  flex-direction: column;\n  align-items: stretch;\n  width: 100%;\n  border-collapse: collapse;\n  overflow: auto;\n}\n\ncomplete-table .table .thead {\n  flex: 1 0 auto;\n  display: flex;\n  flex-direction: column;\n  -webkit-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n\ncomplete-table .table .thead.-headerGroups {\n  background: rgba(0,0,0,0.03);\n  border-bottom: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .thead.-filters {\n  border-bottom: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .thead.-filters input,\ncomplete-table .table .thead.-filters select {\n  border: 1px solid var(--table-border-color);\n  background: #fff;\n  padding: 5px 7px;\n  font-size: inherit;\n  border-radius: 3px;\n  font-weight: normal;\n  outline: none;\n}\n\ncomplete-table .table .thead.-filters .th {\n  border-right: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .thead.-header {\n  box-shadow: 0 2px 15px 0px var(--table-box-shadow);\n}\n\ncomplete-table .table .thead .tr {\n  text-align: center;\n}\n\ncomplete-table .table .thead .th,\ncomplete-table .table .thead .td {\n  padding: 5px 5px;\n  line-height: normal;\n  position: relative;\n  border-right: 1px solid var(--table-border-color);\n  transition: box-shadow 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);\n  box-shadow: inset 0 0 0 0 transparent;\n}\n\ncomplete-table .table .thead .th.-soasc,\ncomplete-table .table .thead .td.-soasc {\n  box-shadow: inset 0 3px 0 0 var(--table-box-shadow);\n}\n\ncomplete-table .table .thead .th.-sodesc,\ncomplete-table .table .thead .td.-sodesc {\n  box-shadow: inset 0 -3px 0 0 var(--table-box-shadow);\n}\n\ncomplete-table .table .thead .th.-cursor-pointer,\ncomplete-table .table .thead .td.-cursor-pointer {\n  cursor: pointer;\n}\n\ncomplete-table .table .thead .th:last-child,\ncomplete-table .table .thead .td:last-child {\n  border-right: 0;\n}\n\ncomplete-table .table .thead .resizable-header {\n  overflow: visible;\n}\n\ncomplete-table .table .thead .resizable-header:last-child {\n  overflow: hidden;\n}\n\ncomplete-table .table .thead .resizable-header-content {\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n\ncomplete-table .table .thead .header-pivot {\n  border-right-color: var(--table-border-color);\n}\n\ncomplete-table .table .thead .header-pivot::after,\ncomplete-table .table .thead .header-pivot::before {\n  left: 100%;\n  top: 50%;\n  border: solid transparent;\n  content: \" \";\n  height: 0;\n  width: 0;\n  position: absolute;\n  pointer-events: none;\n}\n\ncomplete-table .table .thead .header-pivot::after {\n  border-color: rgba(255,255,255,0);\n  border-left-color: #fff;\n  border-width: 8px;\n  margin-top: -8px;\n}\n\ncomplete-table .table .thead .header-pivot::before {\n  border-color: rgba(102,102,102,0);\n  border-left-color: var(--table-border-color);\n  border-width: 10px;\n  margin-top: -10px;\n}\n\ncomplete-table .table .tbody {\n  flex: 99999 1 auto;\n  display: flex;\n  flex-direction: column;\n  overflow: auto;\n}\n\ncomplete-table .table .tbody .tr-group {\n  border-bottom: solid 1px var(--table-border-color);\n}\n\ncomplete-table .table .tbody .tr-group:last-child {\n  border-bottom: 0;\n}\n\ncomplete-table .table .tbody .td {\n  border-right: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .tbody .td:last-child {\n  border-right: 0;\n}\n\ncomplete-table .table .tbody .expandable {\n  cursor: pointer;\n}\n\ncomplete-table .table .tr-group {\n  flex: 1 0 auto;\n  display: flex;\n  flex-direction: column;\n  align-items: stretch;\n}\n\ncomplete-table .table .tr {\n  flex: 1 0 auto;\n  display: inline-flex;\n}\n\ncomplete-table .table .th,\ncomplete-table .table .td {\n  flex: 1 0 0px;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  padding: 7px 5px;\n  overflow: hidden;\n  transition: 0.3s ease;\n  transition-property: width, min-width, padding, opacity;\n  font-size: var(--font-size);\n}\n\ncomplete-table .table .th.-hidden,\ncomplete-table .table .td.-hidden {\n  width: 0 !important;\n  min-width: 0 !important;\n  padding: 0 !important;\n  border: 0 !important;\n  opacity: 0 !important;\n}\n\ncomplete-table .table .expander {\n  display: inline-block;\n  position: relative;\n  margin: 0;\n  color: transparent;\n  margin: 0 10px;\n}\n\ncomplete-table .table .expander::after {\n  content: '';\n  position: absolute;\n  width: 0;\n  height: 0;\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%) rotate(-90deg);\n  border-left: 5.04px solid transparent;\n  border-right: 5.04px solid transparent;\n  border-top: 7px solid var(--table-border-color);\n  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);\n  cursor: pointer;\n}\n\ncomplete-table .table .expander.-open::after {\n  transform: translate(-50%, -50%) rotate(0deg);\n}\n\ncomplete-table .table .resizer {\n  display: inline-block;\n  position: absolute;\n  width: 36px;\n  top: 0;\n  bottom: 0;\n  right: -18px;\n  cursor: col-resize;\n  z-index: 10;\n}\n\ncomplete-table .table .tfoot {\n  flex: 1 0 auto;\n  display: flex;\n  flex-direction: column;\n  box-shadow: 0 0px 15px 0px rgba(0,0,0,0.15);\n}\n\ncomplete-table .table .tfoot .td {\n  border-right: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .tfoot .td:last-child {\n  border-right: 0;\n}\n\ncomplete-table .table.-striped .tr.-odd {\n  background: rgba(0,0,0,0.03);\n}\n\ncomplete-table .table.-highlight .tbody .tr:not(.-padRow):hover {\n  background: rgba(0,0,0,0.05);\n}\n\ncomplete-table .table .-pagination {\n  z-index: 1;\n  display: flex;\n  justify-content: space-between;\n  align-items: stretch;\n  flex-wrap: wrap;\n  padding: 3px;\n  box-shadow: 0 0px 15px 0px rgba(0,0,0,0.1);\n  border-top: 2px solid var(--table-border-color);\n}\n\ncomplete-table .table .-pagination input,\ncomplete-table .table .-pagination select {\n  border: 1px solid var(--table-border-color);\n  background: #fff;\n  padding: 5px 7px;\n  font-size: inherit;\n  border-radius: 3px;\n  font-weight: normal;\n  outline: none;\n}\n\ncomplete-table .table .-pagination .-btn {\n  appearance: none;\n  display: block;\n  width: 100%;\n  height: 100%;\n  border: 0;\n  border-radius: 3px;\n  padding: 6px;\n  font-size: 1em;\n  color: rgba(0,0,0,0.6);\n  background: rgba(0,0,0,0.1);\n  transition: all 0.1s ease;\n  cursor: pointer;\n  outline: none;\n}\n\ncomplete-table .table .-pagination .-btn[disabled] {\n  opacity: 0.5;\n  cursor: default;\n}\n\ncomplete-table .table .-pagination .-btn:not([disabled]):hover {\n  background: rgba(0,0,0,0.3);\n  color: #fff;\n}\n\ncomplete-table .table .-pagination .-previous,\ncomplete-table .table .-pagination .-next {\n  flex: 1;\n  text-align: center;\n}\n\ncomplete-table .table .-pagination .-center {\n  flex: 1.5;\n  text-align: center;\n  margin-bottom: 0;\n  display: flex;\n  flex-direction: row;\n  flex-wrap: wrap;\n  align-items: center;\n  justify-content: space-around;\n}\n\ncomplete-table .table .-pagination .-pageInfo {\n  display: inline-block;\n  margin: 3px 10px;\n  white-space: nowrap;\n}\n\ncomplete-table .table .-pagination .-pageJump {\n  display: inline-block;\n}\n\ncomplete-table .table .-pagination .-pageJump input {\n  width: 70px;\n  text-align: center;\n}\n\ncomplete-table .table .-pagination .-pageSizeOptions {\n  margin: 3px 10px;\n}\n\ncomplete-table .table .noData {\n  display: block;\n  position: absolute;\n  left: 50%;\n  top: 50%;\n  transform: translate(-50%, -50%);\n  background: rgba(255,255,255,0.8);\n  transition: all 0.3s ease;\n  z-index: 1;\n  pointer-events: none;\n  padding: 20px;\n  color: rgba(0,0,0,0.5);\n}\n\ncomplete-table .table .-loading {\n  display: block;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  background: rgba(255,255,255,0.8);\n  transition: all 0.3s ease;\n  z-index: -1;\n  opacity: 0;\n  pointer-events: none;\n}\n\ncomplete-table .table .-loading > div {\n  position: absolute;\n  display: block;\n  text-align: center;\n  width: 100%;\n  top: 50%;\n  left: 0;\n  font-size: 15px;\n  color: rgba(0,0,0,0.6);\n  transform: translateY(-52%);\n  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);\n}\n\ncomplete-table .table .-loading.-active {\n  opacity: 1;\n  z-index: 2;\n  pointer-events: all;\n}\n\ncomplete-table .table .-loading.-active > div {\n  transform: translateY(50%);\n}\n\ncomplete-table .table .resizing .th,\ncomplete-table .table .resizing .td {\n  transition: none !important;\n  cursor: col-resize;\n  user-select: none;\n}\n\ncomplete-table[sticky] .thead {\n  position: sticky;\n  top: 0;\n  background: white;\n}\n\ncomplete-table .table .small {\n  flex: 0 0 0px;\n  min-width: 28px;\n}\n\ncomplete-table .table .draggable-mirror {\n  width: inherit;\n  flex: inherit;\n  cursor: -webkit-grabbing;\n  cursor: grabbing;\n}\n\nbody.draggable--is-dragging {\n  cursor: -webkit-grabbing !important;\n  cursor: grabbing !important;\n}\n\ncomplete-table .table .drag-handle:hover {\n  cursor: -webkit-grab;\n  cursor: grab;\n}\n\nbody.draggable--is-dragging complete-table .table .drag-handle {\n  cursor: -webkit-grabbing;\n  cursor: grabbing;\n}"; }
 }
 
 export { CompleteTable };

@@ -725,8 +725,18 @@ var s=document.querySelector("script[data-namespace='complete-table']");if(s){pu
       instance = elm._instance;
       if (instance) {
         // get an array of method names of watch functions to call
-        internalValues[WATCH_CB_PREFIX + memberName];
-        false;
+        watchMethods = internalValues[WATCH_CB_PREFIX + memberName];
+        if (true, watchMethods) {
+          // this instance is watching for when this property changed
+          for (let i = 0; i < watchMethods.length; i++) {
+            try {
+              // fire off each of the watch methods that are watching this property
+              instance[watchMethods[i]].call(instance, newVal, oldVal, memberName);
+            } catch (e) {
+              console.error(e);
+            }
+          }
+        }
         plt.activeRender || 
         // looks like this value actually changed, so we've got work to do!
         // but only if we've already created an instance, otherwise just chill out

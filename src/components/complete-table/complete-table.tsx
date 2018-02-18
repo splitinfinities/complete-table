@@ -1,5 +1,5 @@
-import { Component, Prop, State, Element, Method } from '@stencil/core';
-import Swappable from '@shopify/draggable/lib/swappable';
+import { Component, Prop, State, Element, Method, Watch } from '@stencil/core';
+import Sortable from '@shopify/draggable/lib/sortable';
 
 @Component({
   tag: 'complete-table',
@@ -10,7 +10,6 @@ export class CompleteTable {
 
   @Prop() sticky: boolean;
   @Prop() raw: boolean = false;
-  @Prop() swappable: boolean = false;
   @Prop() sortable: boolean = false;
   @Prop() resizable: boolean = false;
   @Prop() filterable: boolean = false;
@@ -24,8 +23,13 @@ export class CompleteTable {
   @Prop() items: number = 50;
   @Prop() expandInto: string|"row"|"side-panel"|"dialog" = "row";
 
-  @State() columns: Array<Object>;
-  @State() data: Array<Object>;
+  @State() __sortable: any;
+
+  @State() columns: Array<Object> = [];
+  @State() data: CompleteTableDataModel = {
+    version: 0,
+    list: []
+  };
 
   componentWillLoad() {
     var table = this.element.querySelector('table');
@@ -36,17 +40,36 @@ export class CompleteTable {
   }
 
   componentDidLoad() {
-    if (this.swappable) {
-      const swappable = new Swappable(this.element.querySelector('.tbody'), {
+    this.observeSortable(this.sortable);
+  }
+
+  @Watch('sortable')
+  observeSortable(value: boolean) {
+    if (value) {
+      this.initSortable()
+    } else {
+      this.destroySortable()
+    }
+  }
+
+  initSortable () {
+    if (this.sortable) {
+      this.__sortable = new Sortable(this.element.querySelector('.tbody'), {
         draggable: '.tr',
         handle: '.drag-handle'
       });
 
-      swappable.on('swappable:start', () => console.log('swappable:start'))
-      swappable.on('swappable:swapped', () => console.log('swappable:swapped'));
-      swappable.on('swappable:stop', () => console.log('swappable:stop'));
+      this.__sortable.on('sortable:stop', () => { this.updateDataOnSort() });
+    }
+  }
 
-      console.log(swappable.getDraggableElementsForContainer());
+  updateDataOnSort() {
+    this.gatherData(this.element);
+  }
+
+  destroySortable () {
+    if (!this.sortable && this.__sortable) {
+      this.__sortable.destroy();
     }
   }
 
@@ -64,7 +87,7 @@ export class CompleteTable {
     table.remove();
   }
 
- gatherColumns (table: HTMLTableElement) {
+ gatherColumns (table: HTMLTableElement|HTMLElement) {
     var columns = Array.prototype.map.call(table.querySelectorAll('thead tr'), (tr) => {
       return Array.prototype.map.call(tr.querySelectorAll('td,th'), (td) => {
         return this.sanitizeHeadTD(td);
@@ -74,36 +97,37 @@ export class CompleteTable {
     this.columns = columns;
   }
 
-  gatherData (table: HTMLTableElement) {
-    var data = Array.prototype.map.call(table.querySelectorAll('tbody tr'), (tr) => {
-      return Array.prototype.map.call(tr.querySelectorAll('td,th'), (td) => {
+  gatherData (table: HTMLTableElement|HTMLElement) {
+    var list = Array.prototype.map.call(table.querySelectorAll('tbody tr, .tbody .tr:not(.draggable--original):not(.draggable-mirror)'), (tr) => {
+      return Array.prototype.map.call(tr.querySelectorAll('td:not(.ignore),th:not(.ignore),.td:not(.ignore),.th:not(.ignore)'), (td) => {
         return this.sanitizeTD(td);
       });
     });
 
-    this.data = data;
+    this.data = {
+      version: this.data.version + 1,
+      list: list
+    };
   }
 
   sanitizeHeadTD (element: any): CompleteTableCell {
     return {
-      content: element.innerHTML,
-      name: element.id,
-      id: element.id
+      content: element.innerHTML
     }
   }
 
   sanitizeTD (element: any): CompleteTableCell {
     return {
       content: element.innerHTML,
-      name: element.id,
-      id: element.id
+      name: element.dataset.name,
+      id: element.parentNode.dataset.id
     }
   }
 
   // Render Methods
   renderDragTab () {
     return (
-      <div class="td small">
+      <div class="td small ignore">
         <button class="drag-handle"></button>
       </div>
     );
@@ -111,7 +135,7 @@ export class CompleteTable {
 
   renderSelectColumn () {
     return (
-      <div class="td small">
+      <div class="td small ignore">
         <input type="checkbox" onChange={() => { console.log('Select one item'); }} />
       </div>
     );
@@ -119,13 +143,13 @@ export class CompleteTable {
 
   renderHeaderDragTab () {
     return (
-      <div class="th small"></div>
+      <div class="th small ignore"></div>
     );
   }
 
   renderHeaderSelectColumn () {
     return (
-      <div class="th small">
+      <div class="th small ignore">
         <input type="checkbox" onChange={() => { console.log('Select all'); }} />
       </div>
     );
@@ -144,7 +168,7 @@ export class CompleteTable {
   renderTableHeadRow (row) {
     return (
       <div class="tr">
-        { this.swappable && this.renderHeaderDragTab() }
+        { this.sortable && this.renderHeaderDragTab() }
         { this.selectable && this.renderHeaderSelectColumn() }
         {row.map((row) => {
           return this.renderTableHeadColumnName(row)
@@ -164,7 +188,7 @@ export class CompleteTable {
   renderTableBody () {
     return (
       <div class="tbody">
-        {this.data.map((row, index) => {
+        {this.data.list.map((row, index) => {
           return this.renderTableRow(row, index)
         })}
       </div>
@@ -173,19 +197,19 @@ export class CompleteTable {
 
   renderTableRow (row, index) {
     return (
-      <div class="tr" data-index={index}>
-        { this.swappable && this.renderDragTab() }
+      <div class="tr" data-index={index} data-version={this.data.version}>
+        { this.sortable && this.renderDragTab() }
         { this.selectable && this.renderSelectColumn() }
-        {row.map((row) => {
-          return this.renderTableCell(row)
-        })}
+        { row.map((item, index) => {
+          return this.renderTableCell(item, index)
+        }) }
       </div>
     )
   }
 
-  renderTableCell (item) {
+  renderTableCell (item, index) {
     return (
-     <div class="td" innerHTML={this.raw ? item.content : undefined}>
+     <div class="td" data-index={index} innerHTML={this.raw ? item.content : undefined}>
        {!this.raw ? item.content : undefined}
      </div>
     )
@@ -204,6 +228,11 @@ export class CompleteTable {
 
 interface CompleteTableCell {
   content: string;
-  name: string;
-  id: string;
+  name?: string;
+  id?: string;
+}
+
+interface CompleteTableDataModel {
+  version: number;
+  list: Array<Array<Object>>;
 }

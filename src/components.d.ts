@@ -52,7 +52,6 @@ declare global {
       selectable?: boolean;
       sortable?: boolean;
       sticky?: boolean;
-      swappable?: boolean;
     }
   }
 }
