@@ -81,6 +81,12 @@ export class CompleteTable {
     }
   }
 
+  @Method()
+  updateData(data: any) {
+    this.data.version = data.version;
+    this.data.list = [...data.list];
+  }
+
   prepareContent (table: HTMLTableElement) {
     this.gatherColumns(table);
     this.gatherData(table);
@@ -104,10 +110,10 @@ export class CompleteTable {
       });
     });
 
-    this.data = {
+    this.updateData({
       version: this.data.version + 1,
       list: list
-    };
+    });
   }
 
   sanitizeHeadTD (element: any): CompleteTableCell {
