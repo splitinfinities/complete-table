@@ -1,5 +1,7 @@
 import { Component, Prop, State, Element, Method, Watch } from '@stencil/core';
 import Sortable from '@shopify/draggable/lib/sortable';
+import Draggable from '@shopify/draggable/lib/draggable';
+// import { Drag } from './helpers';
 
 @Component({
   tag: 'complete-table',
@@ -8,15 +10,26 @@ import Sortable from '@shopify/draggable/lib/sortable';
 export class CompleteTable {
   @Element() element: HTMLElement;
 
+  // Done
   @Prop() sticky: boolean;
+
+  // Done
   @Prop() raw: boolean = false;
+
+  // Done
   @Prop() sortable: boolean = false;
+
+// In progress
+  @Prop() selectable: boolean = false;
+
+  // In progress
   @Prop() resizable: boolean = false;
+
+
   @Prop() filterable: boolean = false;
   @Prop() searchable: boolean = false;
   @Prop() editable: boolean = false;
   @Prop() expandable: boolean = false;
-  @Prop() selectable: boolean = false;
   @Prop() readability: string|"border"|"even"|"odd" = undefined;
   @Prop() density: string|"comfortable"|"cozy"|"compact" = "comfortable";
   @Prop() pagination: boolean = false;
@@ -24,6 +37,8 @@ export class CompleteTable {
   @Prop() expandInto: string|"row"|"side-panel"|"dialog" = "row";
 
   @State() __sortable: any;
+  @State() __resizable: any;
+  @State() __resizableState: any;
 
   @State() columns: Array<Object> = [];
   @State() data: CompleteTableDataModel = {
@@ -41,6 +56,7 @@ export class CompleteTable {
 
   componentDidLoad() {
     this.observeSortable(this.sortable);
+    this.observeResizeable(this.resizable);
   }
 
   @Watch('sortable')
@@ -63,13 +79,69 @@ export class CompleteTable {
     }
   }
 
+  destroySortable () {
+    if (!this.sortable && this.__sortable) {
+      this.__sortable.destroy();
+    }
+  }
+
   updateDataOnSort() {
     this.gatherData(this.element);
   }
 
-  destroySortable () {
-    if (!this.sortable && this.__sortable) {
-      this.__sortable.destroy();
+  @Watch('resizable')
+  observeResizeable(value: boolean) {
+    if (value) {
+      this.initResizable()
+    } else {
+      this.destroySizable()
+    }
+  }
+
+  initResizable () {
+    if (this.resizable) {
+      this.__resizable = new Draggable(this.element.querySelector('.thead'), {
+        draggable: '.th',
+        handle: '.resize-handle',
+        classes: {
+          'body:dragging': 'resizable--is-dragging',
+          'container:dragging': 'resizable-container--is-dragging',
+          'source:dragging': 'resizable-source--is-dragging',
+          'source:placed': 'resizable-source--placed',
+          'container:placed': 'resizable-container--placed',
+          'draggable:over': 'resizable--over',
+          'container:over': 'resizable-container--over',
+          'source:original': 'resizable--original',
+          'mirror': 'resizable-mirror',
+        }
+      });
+
+      this.__resizable.on('drag:start', (e) => { this.setResizableState(e) });
+      this.__resizable.on('drag:move', (e) => { this.updateColumnWidth(e) });
+      this.__resizable.off('mirror:move');
+    }
+  }
+
+  pullResizableState(event) {
+    return {
+      columnWidth: event.originalEvent.target.parentNode.offsetWidth,
+      handleWidth: event.originalEvent.target.offsetWidth,
+      position: event.originalEvent.pageX
+    }
+  }
+
+  setResizableState(event) {
+    this.__resizableState = this.pullResizableState(event);
+  }
+
+  updateColumnWidth(event) {
+    const newState = this.pullResizableState(event);
+    console.log(this.__resizableState, newState);
+  }
+
+  destroySizable () {
+    if (!this.resizable && this.__resizable) {
+      this.__resizable.destroy();
     }
   }
 
@@ -126,9 +198,24 @@ export class CompleteTable {
     return {
       content: element.innerHTML,
       name: element.dataset.name,
-      id: element.parentNode.dataset.id
+      id: element.parentNode.dataset.id,
     }
   }
+
+  handleSelectOne(e) {
+    console.log(e.target.checked);
+  }
+
+  handleSelectAll(e) {
+    var event = new Event('change');
+    var inputs = this.element.querySelectorAll('input[type="checkbox"].single');
+    Array.prototype.forEach.call(inputs, (input) => {
+      input.checked = e.target.checked;
+      input.dispatchEvent(event);
+    });
+  }
+
+
 
   // Render Methods
   renderDragTab () {
@@ -139,10 +226,10 @@ export class CompleteTable {
     );
   }
 
-  renderSelectColumn () {
+  renderSelectColumn (index: number) {
     return (
       <div class="td small ignore">
-        <input type="checkbox" onChange={() => { console.log('Select one item'); }} />
+        <input type="checkbox" class="single" value={index} onChange={(e) => { this.handleSelectOne(e) }} />
       </div>
     );
   }
@@ -156,7 +243,7 @@ export class CompleteTable {
   renderHeaderSelectColumn () {
     return (
       <div class="th small ignore">
-        <input type="checkbox" onChange={() => { console.log('Select all'); }} />
+        <input type="checkbox" class="all" onChange={(e) => { this.handleSelectAll(e) }} />
       </div>
     );
   }
@@ -176,17 +263,18 @@ export class CompleteTable {
       <div class="tr">
         { this.sortable && this.renderHeaderDragTab() }
         { this.selectable && this.renderHeaderSelectColumn() }
-        {row.map((row) => {
+        { row.map((row) => {
           return this.renderTableHeadColumnName(row)
-        })}
+        }) }
       </div>
     )
   }
 
   renderTableHeadColumnName (item) {
     return (
-     <div class="th" innerHTML={this.raw ? item.content : undefined}>
-       {!this.raw ? item.content : undefined}
+     <div class="th">
+       { this.resizable && <button class="resize-handle"></button> }
+       <span>{ item.content }</span>
      </div>
     )
   }
@@ -205,7 +293,7 @@ export class CompleteTable {
     return (
       <div class="tr" data-index={index} data-version={this.data.version}>
         { this.sortable && this.renderDragTab() }
-        { this.selectable && this.renderSelectColumn() }
+        { this.selectable && this.renderSelectColumn(index) }
         { row.map((item, index) => {
           return this.renderTableCell(item, index)
         }) }
@@ -231,11 +319,11 @@ export class CompleteTable {
   }
 }
 
-
 interface CompleteTableCell {
   content: string;
   name?: string;
   id?: string;
+  selected?: boolean;
 }
 
 interface CompleteTableDataModel {

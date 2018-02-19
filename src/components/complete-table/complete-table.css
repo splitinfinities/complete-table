@@ -81,6 +81,7 @@ complete-table .table .thead .td {
   border-right: 1px solid var(--table-border-color);
   transition: box-shadow 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-shadow: inset 0 0 0 0 transparent;
+  min-width: 50px;
 }
 
 complete-table .table .thead .th.-soasc,
@@ -231,17 +232,6 @@ complete-table .table .expander::after {
 
 complete-table .table .expander.-open::after {
   transform: translate(-50%, -50%) rotate(0deg);
-}
-
-complete-table .table .resizer {
-  display: inline-block;
-  position: absolute;
-  width: 36px;
-  top: 0;
-  bottom: 0;
-  right: -18px;
-  cursor: col-resize;
-  z-index: 10;
 }
 
 complete-table .table .tfoot {
@@ -417,9 +407,11 @@ complete-table[sticky] .thead {
 
 complete-table .table .small {
   flex: 0 0 0px;
-  min-width: 28px;
+  min-width: 28px !important;
 }
 
+
+/* Draggable */
 complete-table .table .draggable-mirror {
   width: inherit;
   flex: inherit;
@@ -440,4 +432,21 @@ complete-table .table .drag-handle:hover {
 body.draggable--is-dragging complete-table .table .drag-handle {
   cursor: -webkit-grabbing;
   cursor: grabbing;
+}
+
+
+/* Resizable */
+complete-table .table .resize-handle {
+  display: inline-block;
+  position: absolute;
+  width: 36px;
+  top: 0;
+  bottom: 0;
+  right: -18px;
+  cursor: col-resize;
+  z-index: 10;
+}
+
+complete-table .resizable-mirror {
+  display: none;
 }
