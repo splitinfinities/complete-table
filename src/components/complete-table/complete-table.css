@@ -1,6 +1,7 @@
 complete-table {
   --table-border-color: rgba(0,0,0,0.2);
   --table-box-shadow: rgba(0,0,0,0.15);
+  --table-background: white;
   --table-font-size: 1.6rem;
   display: block;
   box-sizing: border-box;
@@ -417,11 +418,16 @@ complete-table .table .draggable-mirror {
   flex: inherit;
   cursor: -webkit-grabbing;
   cursor: grabbing;
+  position:  absolute !important;
+  width: 100%;
+  border: 1px solid var(--table-border-color);
+  background: var(--table-background);
 }
 
 body.draggable--is-dragging {
   cursor: -webkit-grabbing !important;
   cursor: grabbing !important;
+  position: relative !important;
 }
 
 complete-table .table .drag-handle:hover {
