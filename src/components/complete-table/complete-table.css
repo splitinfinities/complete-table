@@ -2,6 +2,10 @@ complete-table {
   --table-border-color: rgba(0,0,0,0.2);
   --table-box-shadow: rgba(0,0,0,0.15);
   --table-background: white;
+  --table-off-color: rgba(0,0,0,0.05);
+  --table-compact: 4px 2px;
+  --table-cozy: 6px 4px;
+  --table-comfortable: 8px 6px;
   --table-font-size: 1.6rem;
   display: block;
   box-sizing: border-box;
@@ -197,6 +201,21 @@ complete-table .table .td {
   transition: 0.3s ease;
   transition-property: width, min-width, padding, opacity;
   font-size: var(--font-size);
+}
+
+complete-table[density="comfortable"] .table .th,
+complete-table[density="comfortable"] .table .td {
+  padding: var(--table-comfortable);
+}
+
+complete-table[density="cozy"] .table .th,
+complete-table[density="cozy"] .table .td {
+  padding: var(--table-cozy);
+}
+
+complete-table[density="compact"] .table .th,
+complete-table[density="compact"] .table .td {
+  padding: var(--table-compact);
 }
 
 complete-table .table .th.-hidden,
@@ -407,10 +426,12 @@ complete-table[sticky] .thead {
 }
 
 complete-table .table .small {
+  display:  flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 0px;
   min-width: 28px !important;
 }
-
 
 /* Draggable */
 complete-table .table .draggable-mirror {
@@ -455,4 +476,21 @@ complete-table .table .resize-handle {
 
 complete-table .resizable-mirror {
   display: none;
+}
+
+/* Readability */
+complete-table[readability] .tr {
+  transition: background 300ms ease 0s;
+}
+
+complete-table[readability="border"] .tr {
+  border-bottom: 1px solid var(--table-border-color);
+}
+
+complete-table[readability="even"] .table .tbody .tr:nth-child(even) {
+  background: var(--table-off-color);
+}
+
+complete-table[readability="odd"] .table .tbody .tr:nth-child(odd) {
+  background: var(--table-off-color);
 }

@@ -8,32 +8,66 @@ import Draggable from '@shopify/draggable/lib/draggable';
   styleUrl: 'complete-table.css'
 })
 export class CompleteTable {
+  /**
+   * The instance of the Element
+   * @type {HTMLElement}
+   */
   @Element() element: HTMLElement;
 
-  // Done
+  /**
+   * Responsible for making the .thead sticky.
+   * @type {boolean}
+   */
   @Prop() sticky: boolean;
 
-  // Done
+  /**
+   * Renders HTML in the table
+   * @type {boolean}
+   */
   @Prop() raw: boolean = false;
 
-  // Done
+  /**
+   * Renders the sortable HTML and prepares sortable behavior
+   * @type {boolean}
+   */
   @Prop() sortable: boolean = false;
 
-// In progress
+  /**
+   * Renders the selectable HTML and prepared the selectable behavior
+   * @type {boolean}
+   */
   @Prop() selectable: boolean = false;
 
-  // In progress
+  /**
+   * Renders the readability HTML and prepares the readability behavior
+   * @type {string}
+   */
+  @Prop() readability: string|"border"|"even"|"odd" = undefined;
+
+  /**
+   * Renders the density HTML and prepares the density behavior
+   * @type {string}
+   */
+  @Prop() density: string|"comfortable"|"cozy"|"compact" = "comfortable";
+
+  /**
+   * Renders the resizable HTML and prepares the resizable behavior
+   * @type {boolean}
+   */
   @Prop() resizable: boolean = false;
 
+  // In Progress
+  @Prop() pagination: boolean = false;
+  @Prop() items: number = 10;
+  @State() __currentPageItems: Array<Object>;
+  @State() __currentPage: number;
+  @State() __pageCount: number;
+  @State() __pageArray: Array<number>;
 
   @Prop() filterable: boolean = false;
   @Prop() searchable: boolean = false;
   @Prop() editable: boolean = false;
   @Prop() expandable: boolean = false;
-  @Prop() readability: string|"border"|"even"|"odd" = undefined;
-  @Prop() density: string|"comfortable"|"cozy"|"compact" = "comfortable";
-  @Prop() pagination: boolean = false;
-  @Prop() items: number = 50;
   @Prop() expandInto: string|"row"|"side-panel"|"dialog" = "row";
 
   @State() __sortable: any;
@@ -57,6 +91,7 @@ export class CompleteTable {
   componentDidLoad() {
     this.observeSortable(this.sortable);
     this.observeResizeable(this.resizable);
+    this.observePagination(this.pagination);
   }
 
   @Watch('sortable')
@@ -145,6 +180,45 @@ export class CompleteTable {
     }
   }
 
+
+  /**
+   * Pagination
+   */
+  @Watch('pagination')
+  observePagination(value: boolean) {
+    if (value) {
+      this.initPagination()
+    } else {
+      this.destroyPagination()
+    }
+  }
+
+  initPagination () {
+    this.__currentPage = 1;
+    this.__pageCount = Math.ceil(this.data.list.length / this.items);
+    this.__pageArray = Array.from(Array(this.__pageCount).keys());
+    this.preparePages();
+  }
+
+  destroyPagination () {
+    this.__currentPage = undefined;
+    this.__pageCount = undefined;
+    this.__pageArray = undefined;
+    this.__currentPageItems = undefined;
+  }
+
+  preparePages() {
+    const low = (this.__currentPage - 1) * this.items;
+    const high = ((this.__currentPage * this.items) - 1);
+    this.__currentPageItems = this.data.list.slice(low, high);
+  }
+
+  updateCurrentPage(select: EventTarget) {
+    // @ts-ignore
+    this.__currentPage = parseInt(select.value);
+    this.preparePages();
+  }
+
   @Method()
   state() {
     return {
@@ -215,8 +289,6 @@ export class CompleteTable {
     });
   }
 
-
-
   // Render Methods
   renderDragTab () {
     return (
@@ -282,7 +354,10 @@ export class CompleteTable {
   renderTableBody () {
     return (
       <div class="tbody">
-        {this.data.list.map((row, index) => {
+        { this.pagination && this.__currentPageItems.map((row, index) => {
+          return this.renderTableRow(row, index)
+        })}
+        { !this.pagination && this.data.list.map((row, index) => {
           return this.renderTableRow(row, index)
         })}
       </div>
@@ -309,9 +384,25 @@ export class CompleteTable {
     )
   }
 
+  renderPageSelect () {
+    return (
+        <div class="td">
+          <select onChange={(e) => { this.updateCurrentPage(e.target); }}>
+            {this.__pageArray && this.__pageArray.map((item) => {
+              return <option selected={this.__currentPage === item} value={item}>{item + 1}</option>
+            }) }
+          </select>
+        </div>
+    )
+  }
+
   render () {
     return (
       <div class="table">
+        <div class="tr options">
+          { this.pagination && this.renderPageSelect() }
+        </div>
+
         { this.renderTableHead() }
         { this.renderTableBody() }
       </div>
