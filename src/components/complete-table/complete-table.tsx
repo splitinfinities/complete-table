@@ -56,14 +56,47 @@ export class CompleteTable {
    */
   @Prop() resizable: boolean = false;
 
-  // In Progress
+  /**
+   * Renders the pagination HTML and prepares the pagination behavior
+   * @type {boolean}
+   */
   @Prop() pagination: boolean = false;
+
+  /**
+   * Controls how many items are in the pagination
+   * @default 10
+   * @type {number}
+   */
   @Prop() items: number = 10;
+
+  /**
+   * PRIVATE: holds the current page of items to render
+   * @type {Array}
+   */
   @State() __currentPageItems: Array<Object>;
+
+  /**
+   * PRIVATE: Holds the current page number
+   * @type {number}
+   */
   @State() __currentPage: number;
+
+  /**
+   * PRIVATE: holds the count of pages for the items property divided by total items in the array
+   * @type {[type]}
+   */
   @State() __pageCount: number;
+
+  /**
+   * PRIVATE: Holds the current pages
+   * @type {[type]}
+   */
   @State() __pageArray: Array<number>;
 
+  /**
+   * Renders the filterable HTML and prepares the filterable behavior
+   * @type {[type]}
+   */
   @Prop() filterable: boolean = false;
   @Prop() searchable: boolean = false;
   @Prop() editable: boolean = false;
