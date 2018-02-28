@@ -3,6 +3,7 @@ complete-table {
   --table-box-shadow: rgba(0,0,0,0.15);
   --table-background: white;
   --table-off-color: rgba(0,0,0,0.05);
+  --table-selected-color: rgba(0,0,0,0.075);
   --table-compact: 4px 2px;
   --table-cozy: 6px 4px;
   --table-comfortable: 8px 6px;
@@ -493,4 +494,9 @@ complete-table[readability="even"] .table .tbody .tr:nth-child(even) {
 
 complete-table[readability="odd"] .table .tbody .tr:nth-child(odd) {
   background: var(--table-off-color);
+}
+
+
+complete-table .selected {
+  background: var(--table-selected-color) !important;
 }

@@ -39,6 +39,19 @@ export class CompleteTable {
   @Prop() selectable: boolean = false;
 
   /**
+   * PRIVATE: Holds the selected state.
+   * @private
+   * @type {[type]}
+   */
+  @State() __selected: Array<number> = [];
+
+  /**
+   * Renders and stores the name of the table
+   * @type {string}
+   */
+  @State() __name: string;
+
+  /**
    * Renders the readability HTML and prepares the readability behavior
    * @type {string}
    */
@@ -73,7 +86,7 @@ export class CompleteTable {
    * PRIVATE: holds the current page of items to render
    * @type {Array}
    */
-  @State() __currentPageItems: Array<Object>;
+  @State() __currentPageItems: Array<Object> = undefined;
 
   /**
    * PRIVATE: Holds the current page number
@@ -227,7 +240,7 @@ export class CompleteTable {
   }
 
   initPagination () {
-    this.__currentPage = 1;
+    this.__currentPage = 0;
     this.__pageCount = Math.ceil(this.data.list.length / this.items);
     this.__pageArray = Array.from(Array(this.__pageCount).keys());
     this.preparePages();
@@ -267,6 +280,7 @@ export class CompleteTable {
   }
 
   prepareContent (table: HTMLTableElement) {
+    this.__name = this.element.querySelector('table').getAttribute('name');
     this.gatherColumns(table);
     this.gatherData(table);
     table.remove();
@@ -304,13 +318,26 @@ export class CompleteTable {
   sanitizeTD (element: any): CompleteTableCell {
     return {
       content: element.innerHTML,
-      name: element.dataset.name,
       id: element.parentNode.dataset.id,
     }
   }
 
+  valueSelected (value) {
+    // @ts-ignore
+    return this.__selected.includes(value.toString())
+  }
+
   handleSelectOne(e) {
-    console.log(e.target.checked);
+    let updated = [];
+
+    if (e.target.checked) {
+      updated.push(e.target.value);
+      this.__selected = [...updated, ...this.__selected];
+      e.target.parentNode.parentNode.classList.add('selected');
+    } else {
+      this.__selected = this.__selected.filter(item => item !== e.target.value);
+      e.target.parentNode.parentNode.classList.remove('selected');
+    }
   }
 
   handleSelectAll(e) {
@@ -331,11 +358,10 @@ export class CompleteTable {
     );
   }
 
-  renderSelectColumn (index: number) {
+  renderSelectColumn (row: CompleteTableCell) {
     return (
-      <div class="td small ignore">
-        <input type="checkbox" class="single" value={index} onChange={(e) => { this.handleSelectOne(e) }} />
-      </div>
+      // @ts-ignore
+      <div class="td small ignore"><input type="checkbox" class="single" value={row[0].id} checked={this.valueSelected(row[0].id)} onChange={(e) => { this.handleSelectOne(e) }} /></div>
     );
   }
 
@@ -346,11 +372,17 @@ export class CompleteTable {
   }
 
   renderHeaderSelectColumn () {
-    return (
-      <div class="th small ignore">
-        <input type="checkbox" class="all" onChange={(e) => { this.handleSelectAll(e) }} />
-      </div>
-    );
+    if (this.pagination) {
+      return (
+        // @ts-ignore
+        <div class="th small ignore"></div>
+      );
+    } else {
+      return (
+        // @ts-ignore
+        <div class="th small ignore"><input type="checkbox" class="all" indeterminate={this.__selected.length !== this.data.list.length && this.__selected.length !== 0} onChange={(e) => { this.handleSelectAll(e) }} /></div>
+      );
+    }
   }
 
   renderTableHead () {
@@ -387,7 +419,7 @@ export class CompleteTable {
   renderTableBody () {
     return (
       <div class="tbody">
-        { this.pagination && this.__currentPageItems.map((row, index) => {
+        { this.pagination && this.__currentPageItems && this.__currentPageItems.map((row, index) => {
           return this.renderTableRow(row, index)
         })}
         { !this.pagination && this.data.list.map((row, index) => {
@@ -398,10 +430,12 @@ export class CompleteTable {
   }
 
   renderTableRow (row, index) {
+    const selected = (this.valueSelected(row[0].id)) ? 'selected' : '';
+
     return (
-      <div class="tr" data-index={index} data-version={this.data.version}>
+      <div class={`tr ${selected}`} data-index={index} data-version={this.data.version}>
         { this.sortable && this.renderDragTab() }
-        { this.selectable && this.renderSelectColumn(index) }
+        { this.selectable && this.renderSelectColumn(row) }
         { row.map((item, index) => {
           return this.renderTableCell(item, index)
         }) }
@@ -429,15 +463,32 @@ export class CompleteTable {
     )
   }
 
+  renderPageSelectNumber () {
+    return (
+      <div>
+        <p>{this.__selected.length} of {this.data.list.length} selected</p>
+      </div>
+    )
+  }
+
+  renderSelectedItems () {
+    return this.__selected.map((value) => {
+      return <input type="hidden" name={this.__name} value={value} checked={true} />
+    });
+  }
+
   render () {
     return (
-      <div class="table">
+      // @ts-ignore
+      <div class="table" name={this.__name}>
         <div class="tr options">
           { this.pagination && this.renderPageSelect() }
+          { this.pagination && this.renderPageSelectNumber() }
         </div>
 
         { this.renderTableHead() }
         { this.renderTableBody() }
+        { this.selectable && this.renderSelectedItems() }
       </div>
     );
   }
