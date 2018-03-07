@@ -43,6 +43,7 @@ declare global {
       expandable?: boolean;
       expandInto?: string|"row"|"side-panel"|"dialog";
       filterable?: boolean;
+      history?: boolean;
       items?: number;
       pagination?: boolean;
       raw?: boolean;

@@ -1,4 +1,6 @@
 import { Component, Prop, State, Element, Method, Watch } from '@stencil/core';
+import Dexie from 'dexie';
+import merge from 'deepmerge';
 import Sortable from '@shopify/draggable/lib/sortable';
 import Draggable from '@shopify/draggable/lib/draggable';
 // import { Drag } from './helpers';
@@ -39,7 +41,7 @@ export class CompleteTable {
   @Prop() selectable: boolean = false;
 
   /**
-   * PRIVATE: Holds the selected state.
+   * Holds the selected state.
    * @private
    * @type {[type]}
    */
@@ -49,7 +51,7 @@ export class CompleteTable {
    * Renders and stores the name of the table
    * @type {string}
    */
-  @State() __name: string;
+  @State() __name: string = "complete_table";
 
   /**
    * Renders the readability HTML and prepares the readability behavior
@@ -83,28 +85,50 @@ export class CompleteTable {
   @Prop() items: number = 10;
 
   /**
-   * PRIVATE: holds the current page of items to render
+   * holds the current page of items to render
+   * @private
    * @type {Array}
    */
   @State() __currentPageItems: Array<Object> = undefined;
 
   /**
-   * PRIVATE: Holds the current page number
+   * Holds the current page number
+   * @private
    * @type {number}
    */
   @State() __currentPage: number;
 
   /**
-   * PRIVATE: holds the count of pages for the items property divided by total items in the array
+   * Holds the count of pages for the items property divided by total items in the array
+   * @private
    * @type {[type]}
    */
   @State() __pageCount: number;
 
   /**
-   * PRIVATE: Holds the current pages
+   * Holds the current pages
+   * @private
    * @type {[type]}
    */
   @State() __pageArray: Array<number>;
+
+  /**
+   * Renders the history HTML and prepares the history behavior
+   * @type {boolean}
+   */
+  @Prop() history: boolean = false;
+
+  /**
+   * Holds the reference to indexed db
+   * @type {boolean}
+   */
+  @State() __history: any;
+
+  /**
+   * Renders the editable HTML and prepares the editable behavior
+   * @type {boolean}
+   */
+  @Prop() editable: boolean = false;
 
   /**
    * Renders the filterable HTML and prepares the filterable behavior
@@ -112,7 +136,6 @@ export class CompleteTable {
    */
   @Prop() filterable: boolean = false;
   @Prop() searchable: boolean = false;
-  @Prop() editable: boolean = false;
   @Prop() expandable: boolean = false;
   @Prop() expandInto: string|"row"|"side-panel"|"dialog" = "row";
 
@@ -135,11 +158,17 @@ export class CompleteTable {
   }
 
   componentDidLoad() {
+    this.observeHistory(this.history);
     this.observeSortable(this.sortable);
     this.observeResizeable(this.resizable);
     this.observePagination(this.pagination);
   }
 
+
+
+  /**
+   * Sortable
+   */
   @Watch('sortable')
   observeSortable(value: boolean) {
     if (value) {
@@ -170,12 +199,17 @@ export class CompleteTable {
     this.gatherData(this.element);
   }
 
+
+
+  /**
+   * Resizable
+   */
   @Watch('resizable')
   observeResizeable(value: boolean) {
     if (value) {
       this.initResizable()
     } else {
-      this.destroySizable()
+      this.destroyResizable()
     }
   }
 
@@ -220,11 +254,12 @@ export class CompleteTable {
     console.log(this.__resizableState, newState);
   }
 
-  destroySizable () {
+  destroyResizable () {
     if (!this.resizable && this.__resizable) {
       this.__resizable.destroy();
     }
   }
+
 
 
   /**
@@ -265,6 +300,67 @@ export class CompleteTable {
     this.preparePages();
   }
 
+
+
+  /**
+   * Editable
+   */
+  @Watch('editable')
+  observeEditable(value: boolean) {
+    if (value) {
+      this.initEditable()
+    } else {
+      this.destroyEditable()
+    }
+  }
+
+  initEditable () {
+
+  }
+
+  destroyEditable () {
+
+  }
+
+
+  /**
+   * History
+   */
+  @Watch('history')
+  observeHistory(value: boolean) {
+    if (value) {
+      this.initHistory()
+    } else {
+      this.destroyHistory()
+    }
+  }
+
+  initHistory () {
+    this.__history = new Dexie(this.__name);
+    this.__history.version(1).stores({
+      history: 'version'
+    });
+
+    this.__history.open().catch(function(error) {
+      alert('Uh oh : ' + error);
+    });
+
+    this.__history.history.clear();
+
+    this.__history.history.add(this.data);
+  }
+
+  destroyHistory () {
+
+  }
+
+  async applyVersion (version: any) {
+    const state = await this.__history.history
+      .where({ 'version': parseInt(version) }).first();
+
+   this.updateData(state);
+  }
+
   @Method()
   state() {
     return {
@@ -276,7 +372,36 @@ export class CompleteTable {
   @Method()
   updateData(data: any) {
     this.data.version = data.version;
-    this.data.list = [...data.list];
+
+    function oldArrayMerge(target, source, optionsArgument) {
+        const destination = target.slice()
+
+        source.forEach(function(e, i) {
+            if (typeof destination[i] === 'undefined') {
+                const cloneRequested = !optionsArgument || optionsArgument.clone !== false
+                const shouldClone = cloneRequested && isMergeableObject(e)
+                destination[i] = shouldClone ? clone(e, optionsArgument) : e
+            } else if (isMergeableObject(e)) {
+                destination[i] = merge(target[i], e, optionsArgument)
+            } else if (target.indexOf(e) === -1) {
+                destination.push(e)
+            }
+        })
+        return destination
+    }
+
+    this.data.list = merge(this.data.list, data.list, { arrayMerge: oldArrayMerge });
+
+    this.data = {...this.data};
+
+    if (this.history && this.__history) {
+      this.__history.history.put(this.data);
+    }
+  }
+
+  handleVersionChange(e) {
+    const version = e.target.value;
+    this.applyVersion(version);
   }
 
   prepareContent (table: HTMLTableElement) {
@@ -327,6 +452,44 @@ export class CompleteTable {
     return this.__selected.includes(value.toString())
   }
 
+  createEditableItem (row, column, value) {
+    const input = document.createElement('input');
+    input.value = value;
+    input.autofocus = true;
+    input.onblur = (e) => {
+      const updates = this.data.list;
+
+      // @ts-ignore
+      updates[row][column].content = e.target.value;
+
+      this.updateData({
+        version: this.data.version + 1,
+        list: updates
+      });
+
+      // @ts-ignore
+      e.target.parentElement.classList.remove('editing');
+
+      // @ts-ignore
+      e.target.parentElement.innerHTML = e.target.value;
+    }
+
+    return input;
+  }
+
+  handleCellDoubleClick (e, value) {
+    const item = e.target;
+    const row = parseInt(item.parentNode.dataset.index);
+    const column = parseInt(item.dataset.index);
+
+    if (this.raw) {
+      e.target.innerHTML = "";
+    }
+
+    item.appendChild(this.createEditableItem(row, column, value));
+    item.classList.add('editing');
+  }
+
   handleSelectOne(e) {
     let updated = [];
 
@@ -368,6 +531,14 @@ export class CompleteTable {
   renderHeaderDragTab () {
     return (
       <div class="th small ignore"></div>
+    );
+  }
+
+  renderHeaderHistoryColumn () {
+    return (
+      <div class="th">
+        <input type="number" value={this.data.version} onChange={ (e) => { this.handleVersionChange(e); } } />
+      </div>
     );
   }
 
@@ -445,7 +616,7 @@ export class CompleteTable {
 
   renderTableCell (item, index) {
     return (
-     <div class="td" data-index={index} innerHTML={this.raw ? item.content : undefined}>
+     <div class="td" data-index={index} innerHTML={this.raw ? item.content : undefined} onDblClick={(e) => { this.handleCellDoubleClick(e, item.content); }}>
        {!this.raw ? item.content : undefined}
      </div>
     )
@@ -482,6 +653,7 @@ export class CompleteTable {
       // @ts-ignore
       <div class="table" name={this.__name}>
         <div class="tr options">
+          { this.history && this.renderHeaderHistoryColumn() }
           { this.pagination && this.renderPageSelect() }
           { this.pagination && this.renderPageSelectNumber() }
         </div>
