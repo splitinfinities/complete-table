@@ -46,7 +46,6 @@ declare global {
       history?: boolean;
       items?: number;
       pagination?: boolean;
-      raw?: boolean;
       readability?: string|"border"|"even"|"odd";
       resizable?: boolean;
       searchable?: boolean;

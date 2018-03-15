@@ -23,12 +23,6 @@ export class CompleteTable {
   @Prop() sticky: boolean;
 
   /**
-   * Renders HTML in the table
-   * @type {boolean}
-   */
-  @Prop() raw: boolean = false;
-
-  /**
    * Renders the sortable HTML and prepares sortable behavior
    * @type {boolean}
    */
@@ -146,7 +140,8 @@ export class CompleteTable {
   @State() columns: Array<Object> = [];
   @State() data: CompleteTableDataModel = {
     version: 0,
-    list: []
+    list: [],
+    selected: []
   };
 
   componentWillLoad() {
@@ -185,7 +180,7 @@ export class CompleteTable {
         handle: '.drag-handle'
       });
 
-      this.__sortable.on('sortable:stop', () => { this.updateDataOnSort() });
+      this.__sortable.on('sortable:stop', () => { this.updateDataOnSort(); });
     }
   }
 
@@ -365,34 +360,21 @@ export class CompleteTable {
   state() {
     return {
       columns: this.columns,
-      data: this.data
+      data: this.data,
+      selected: this.__selected
     }
   }
 
   @Method()
   updateData(data: any) {
-    this.data.version = data.version;
-
-    function oldArrayMerge(target, source, optionsArgument) {
-        const destination = target.slice()
-
-        source.forEach(function(e, i) {
-            if (typeof destination[i] === 'undefined') {
-                const cloneRequested = !optionsArgument || optionsArgument.clone !== false
-                const shouldClone = cloneRequested && isMergeableObject(e)
-                destination[i] = shouldClone ? clone(e, optionsArgument) : e
-            } else if (isMergeableObject(e)) {
-                destination[i] = merge(target[i], e, optionsArgument)
-            } else if (target.indexOf(e) === -1) {
-                destination.push(e)
-            }
-        })
-        return destination
+    // @ts-ignore
+    function overwriteMerge(destinationArray, sourceArray, options) {
+        return sourceArray
     }
 
-    this.data.list = merge(this.data.list, data.list, { arrayMerge: oldArrayMerge });
+    this.data = merge(this.data, data, { arrayMerge: overwriteMerge });
 
-    this.data = {...this.data};
+    this.__selected = this.data.selected;
 
     if (this.history && this.__history) {
       this.__history.history.put(this.data);
@@ -421,16 +403,19 @@ export class CompleteTable {
     this.columns = columns;
   }
 
-  gatherData (table: HTMLTableElement|HTMLElement) {
+  async gatherData (table: HTMLTableElement|HTMLElement) {
     var list = Array.prototype.map.call(table.querySelectorAll('tbody tr, .tbody .tr:not(.draggable--original):not(.draggable-mirror)'), (tr) => {
       return Array.prototype.map.call(tr.querySelectorAll('td:not(.ignore),th:not(.ignore),.td:not(.ignore),.th:not(.ignore)'), (td) => {
         return this.sanitizeTD(td);
       });
     });
 
+    console.log(list);
+
     this.updateData({
       version: this.data.version + 1,
-      list: list
+      list: list,
+      selected: this.__selected
     });
   }
 
@@ -448,8 +433,10 @@ export class CompleteTable {
   }
 
   valueSelected (value) {
-    // @ts-ignore
-    return this.__selected.includes(value.toString())
+    if (value) {
+      // @ts-ignore
+      return this.__selected.includes(value.toString());
+    }
   }
 
   createEditableItem (row, column, value) {
@@ -464,7 +451,8 @@ export class CompleteTable {
 
       this.updateData({
         version: this.data.version + 1,
-        list: updates
+        list: updates,
+        selected: this.__selected
       });
 
       // @ts-ignore
@@ -482,25 +470,29 @@ export class CompleteTable {
     const row = parseInt(item.parentNode.dataset.index);
     const column = parseInt(item.dataset.index);
 
-    if (this.raw) {
-      e.target.innerHTML = "";
-    }
+    e.target.innerHTML = "";
 
     item.appendChild(this.createEditableItem(row, column, value));
     item.classList.add('editing');
   }
 
-  handleSelectOne(e) {
+  handleSelectOne(e, row_id) {
     let updated = [];
 
     if (e.target.checked) {
-      updated.push(e.target.value);
-      this.__selected = [...updated, ...this.__selected];
+      updated.push(row_id);
+      this.__selected = Array.from(new Set([...updated, ...this.__selected]));
       e.target.parentNode.parentNode.classList.add('selected');
     } else {
-      this.__selected = this.__selected.filter(item => item !== e.target.value);
+      this.__selected = this.__selected.filter(item => item !== row_id);
       e.target.parentNode.parentNode.classList.remove('selected');
     }
+
+    this.updateData({
+      version: this.data.version + 1,
+      list: this.data.list,
+      selected: this.__selected
+    });
   }
 
   handleSelectAll(e) {
@@ -522,9 +514,10 @@ export class CompleteTable {
   }
 
   renderSelectColumn (row: CompleteTableCell) {
+    console.log(row[0]);
     return (
       // @ts-ignore
-      <div class="td small ignore"><input type="checkbox" class="single" value={row[0].id} checked={this.valueSelected(row[0].id)} onChange={(e) => { this.handleSelectOne(e) }} /></div>
+      <div class="td small ignore"><input type="checkbox" class="single" value={row[0].id} checked={this.valueSelected(row[0].id)} onChange={(e) => { this.handleSelectOne(e, row[0].id) }} /></div>
     );
   }
 
@@ -551,7 +544,7 @@ export class CompleteTable {
     } else {
       return (
         // @ts-ignore
-        <div class="th small ignore"><input type="checkbox" class="all" indeterminate={this.__selected.length !== this.data.list.length && this.__selected.length !== 0} onChange={(e) => { this.handleSelectAll(e) }} /></div>
+        <div class="th small ignore"><input type="checkbox" class="all" indeterminate={this.__selected.length !== this.data.list.length && this.__selected.length !== 0} checked={this.__selected.length === this.data.list.length} onChange={(e) => { this.handleSelectAll(e) }} /></div>
       );
     }
   }
@@ -604,7 +597,7 @@ export class CompleteTable {
     const selected = (this.valueSelected(row[0].id)) ? 'selected' : '';
 
     return (
-      <div class={`tr ${selected}`} data-index={index} data-version={this.data.version}>
+      <div class={`tr ${selected}`} data-id={row[0].id} data-index={index} data-version={this.data.version}>
         { this.sortable && this.renderDragTab() }
         { this.selectable && this.renderSelectColumn(row) }
         { row.map((item, index) => {
@@ -616,9 +609,7 @@ export class CompleteTable {
 
   renderTableCell (item, index) {
     return (
-     <div class="td" data-index={index} innerHTML={this.raw ? item.content : undefined} onDblClick={(e) => { this.handleCellDoubleClick(e, item.content); }}>
-       {!this.raw ? item.content : undefined}
-     </div>
+     <div class="td" data-index={index} innerHTML={item.content} onDblClick={(e) => { this.handleCellDoubleClick(e, item.content); }}></div>
     )
   }
 
@@ -676,4 +667,5 @@ interface CompleteTableCell {
 interface CompleteTableDataModel {
   version: number;
   list: Array<Array<Object>>;
+  selected: Array<number>;
 }
