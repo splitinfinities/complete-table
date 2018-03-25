@@ -4,54 +4,144 @@
  * and imports for stencil collections that might be configured in your stencil.config.js file
  */
 
+import '@stencil/core';
 
 declare global {
+  namespace JSX {
+    interface Element {}
+    export interface IntrinsicElements {}
+  }
+  namespace JSXElements {}
+
   interface HTMLStencilElement extends HTMLElement {
     componentOnReady(): Promise<this>;
     componentOnReady(done: (ele?: this) => void): void;
+
+    forceUpdate(): void;
   }
+
+  interface HTMLAttributes {}
 }
 
 
-
-import {
-  CompleteTable as CompleteTable
-} from './components/complete-table/complete-table';
-
 declare global {
-  interface HTMLCompleteTableElement extends CompleteTable, HTMLStencilElement {
+  interface HTMLCompleteTableElement extends HTMLStencilElement {
+    /**
+     * Renders the density HTML and prepares the density behavior
+     */
+    'density': string|"comfortable"|"cozy"|"compact";
+    /**
+     * Renders the editable HTML and prepares the editable behavior
+     */
+    'editable': boolean;
+    'expandInto': string|"row"|"side-panel"|"dialog";
+    'expandable': boolean;
+    /**
+     * Renders the filterable HTML and prepares the filterable behavior
+     */
+    'filterable': boolean;
+    /**
+     * Renders the history HTML and prepares the history behavior
+     */
+    'history': boolean;
+    /**
+     * Controls how many items are in the pagination
+     */
+    'items': number;
+    /**
+     * Renders the pagination HTML and prepares the pagination behavior
+     */
+    'pagination': boolean;
+    /**
+     * Renders the readability HTML and prepares the readability behavior
+     */
+    'readability': string|"border"|"even"|"odd";
+    'redo': () => void;
+    /**
+     * Renders the resizable HTML and prepares the resizable behavior
+     */
+    'resizable': boolean;
+    'searchable': boolean;
+    /**
+     * Renders the selectable HTML and prepared the selectable behavior
+     */
+    'selectable': boolean;
+    /**
+     * Renders the sortable HTML and prepares sortable behavior
+     */
+    'sortable': boolean;
+    'state': () => { columns: Object[]; data: CompleteTableDataModel; selected: number[]; };
+    /**
+     * Responsible for making the .thead sticky.
+     */
+    'sticky': boolean;
+    'undo': () => void;
+    'updateData': (data: any) => void;
   }
   var HTMLCompleteTableElement: {
     prototype: HTMLCompleteTableElement;
     new (): HTMLCompleteTableElement;
   };
   interface HTMLElementTagNameMap {
-    "complete-table": HTMLCompleteTableElement;
+    'complete-table': HTMLCompleteTableElement;
   }
   interface ElementTagNameMap {
-    "complete-table": HTMLCompleteTableElement;
+    'complete-table': HTMLCompleteTableElement;
   }
   namespace JSX {
     interface IntrinsicElements {
-      "complete-table": JSXElements.CompleteTableAttributes;
+      'complete-table': JSXElements.CompleteTableAttributes;
     }
   }
   namespace JSXElements {
     export interface CompleteTableAttributes extends HTMLAttributes {
-      density?: string|"comfortable"|"cozy"|"compact";
-      editable?: boolean;
-      expandable?: boolean;
-      expandInto?: string|"row"|"side-panel"|"dialog";
-      filterable?: boolean;
-      history?: boolean;
-      items?: number;
-      pagination?: boolean;
-      readability?: string|"border"|"even"|"odd";
-      resizable?: boolean;
-      searchable?: boolean;
-      selectable?: boolean;
-      sortable?: boolean;
-      sticky?: boolean;
+      /**
+       * Renders the density HTML and prepares the density behavior
+       */
+      'density'?: string|"comfortable"|"cozy"|"compact";
+      /**
+       * Renders the editable HTML and prepares the editable behavior
+       */
+      'editable'?: boolean;
+      'expandInto'?: string|"row"|"side-panel"|"dialog";
+      'expandable'?: boolean;
+      /**
+       * Renders the filterable HTML and prepares the filterable behavior
+       */
+      'filterable'?: boolean;
+      /**
+       * Renders the history HTML and prepares the history behavior
+       */
+      'history'?: boolean;
+      /**
+       * Controls how many items are in the pagination
+       */
+      'items'?: number;
+      /**
+       * Renders the pagination HTML and prepares the pagination behavior
+       */
+      'pagination'?: boolean;
+      /**
+       * Renders the readability HTML and prepares the readability behavior
+       */
+      'readability'?: string|"border"|"even"|"odd";
+      /**
+       * Renders the resizable HTML and prepares the resizable behavior
+       */
+      'resizable'?: boolean;
+      'searchable'?: boolean;
+      /**
+       * Renders the selectable HTML and prepared the selectable behavior
+       */
+      'selectable'?: boolean;
+      /**
+       * Renders the sortable HTML and prepares sortable behavior
+       */
+      'sortable'?: boolean;
+      /**
+       * Responsible for making the .thead sticky.
+       */
+      'sticky'?: boolean;
     }
   }
 }

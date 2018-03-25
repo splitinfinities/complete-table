@@ -1,5 +1,5 @@
 /*! Built with http://stenciljs.com */
-const { h, Context } = window.CompleteTable;
+const { h } = window.CompleteTable;
 
 var global$1 = typeof global !== "undefined" ? global :
             typeof self !== "undefined" ? self :
@@ -308,11 +308,6 @@ var NEEDS_THROW_FOR_STACK = !new Error("").stack;
 function getErrorWithStack() {
     if (NEEDS_THROW_FOR_STACK)
         try {
-            // Doing something naughty in strict mode here to trigger a specific error
-            // that can be explicitely ignored in debugger's exception settings.
-            // If we'd just throw new Error() here, IE's debugger's exception settings
-            // will just consider it as "exception thrown by javascript code" which is
-            // something you wouldn't want it to ignore.
             throw new Error(); // Fallback if above line don't throw.
         }
         catch (e) {
@@ -4594,8 +4589,6 @@ var deepmerge_1 = deepmerge;
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
-
-
 function unwrapExports (x) {
 	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
 }
@@ -4677,6 +4670,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 exports.__esModule = true;
 
 exports.default = function (instance, Constructor) {
@@ -4688,6 +4682,7 @@ exports.default = function (instance, Constructor) {
 /***/ }),
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 exports.__esModule = true;
 
@@ -4719,6 +4714,7 @@ exports.default = function () {
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 exports.__esModule = true;
 
 var _typeof2 = __webpack_require__(43);
@@ -4738,6 +4734,7 @@ exports.default = function (self, call) {
 /***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 exports.__esModule = true;
 
@@ -4985,6 +4982,7 @@ module.exports = {};
 /* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -5002,6 +5000,7 @@ exports.closest = _closest2.default;
 /* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -5017,6 +5016,7 @@ exports.default = _Sensor2.default;
 /***/ }),
 /* 20 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -5055,6 +5055,7 @@ module.exports = function(key){
 /***/ }),
 /* 23 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -5322,6 +5323,7 @@ exports.f = __webpack_require__(10) ? gOPD : function getOwnPropertyDescriptor(O
 /* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -5357,6 +5359,7 @@ module.exports = function(it){
 /***/ }),
 /* 43 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 exports.__esModule = true;
 
@@ -5567,6 +5570,7 @@ module.exports = function(KEY, exec){
 /* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 exports.__esModule = true;
 
 var _from = __webpack_require__(101);
@@ -5590,6 +5594,7 @@ exports.default = function (arr) {
 /***/ }),
 /* 54 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -5620,6 +5625,7 @@ exports.Accessibility = _Accessibility2.default;
 /* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -5635,6 +5641,7 @@ exports.default = _Sortable2.default;
 /***/ }),
 /* 56 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -6217,6 +6224,7 @@ module.exports = __webpack_require__(4).Symbol;
 /* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
+// ECMAScript 6 symbols shim
 var global         = __webpack_require__(6)
   , has            = __webpack_require__(11)
   , DESCRIPTORS    = __webpack_require__(10)
@@ -6601,6 +6609,7 @@ __webpack_require__(37)('observable');
 /* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 exports.__esModule = true;
 
 var _getPrototypeOf = __webpack_require__(86);
@@ -6774,6 +6783,7 @@ $export($export.S, 'Object', {create: __webpack_require__(29)});
 /* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -6794,6 +6804,7 @@ exports.default = _Draggable2.default;
 /***/ }),
 /* 100 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -7641,7 +7652,7 @@ var ctx            = __webpack_require__(24)
   , createProperty = __webpack_require__(106)
   , getIterFn      = __webpack_require__(107);
 
-$export($export.S + $export.F * !__webpack_require__(109)(function(iter){  }), 'Array', {
+$export($export.S + $export.F * !__webpack_require__(109)(function(iter){ }), 'Array', {
   // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
   from: function from(arrayLike/*, mapfn = undefined, thisArg = undefined*/){
     var O       = toObject(arrayLike)
@@ -7763,7 +7774,6 @@ var ITERATOR     = __webpack_require__(5)('iterator')
 try {
   var riter = [7][ITERATOR]();
   riter['return'] = function(){ SAFE_CLOSING = true; };
-  
 } catch(e){ /* empty */ }
 
 module.exports = function(exec, skipClosing){
@@ -7783,6 +7793,7 @@ module.exports = function(exec, skipClosing){
 /* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -7798,6 +7809,7 @@ exports.default = _closest2.default;
 /***/ }),
 /* 111 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -7870,6 +7882,7 @@ function closest(element, value) {
 /* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -7887,6 +7900,7 @@ exports.defaultMirrorOptions = _Mirror.defaultOptions;
 /***/ }),
 /* 113 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -8160,6 +8174,7 @@ function withPromise(callback) {
 /* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 exports.__esModule = true;
 
 exports.default = function (obj, keys) {
@@ -8177,6 +8192,7 @@ exports.default = function (obj, keys) {
 /***/ }),
 /* 115 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -8249,6 +8265,7 @@ exports.default = AbstractPlugin;
 /* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -8266,6 +8283,7 @@ exports.defaultAutoScrollOptions = _AutoScroll.defaultOptions;
 /***/ }),
 /* 117 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -8541,6 +8559,7 @@ function closestScrollableElement(element) {
 /* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -8556,6 +8575,7 @@ exports.default = _Accessibility2.default;
 /***/ }),
 /* 119 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -8780,6 +8800,7 @@ function _onDragStop(_ref4) {
 /* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -8816,6 +8837,7 @@ exports.ForceTouchSensor = _ForceTouchSensor2.default;
 /***/ }),
 /* 121 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -8928,6 +8950,7 @@ exports.default = Sensor;
 /* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -8943,6 +8966,7 @@ exports.default = _MouseSensor2.default;
 /***/ }),
 /* 123 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -9199,6 +9223,7 @@ function preventNativeDragStart(event) {
 /* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -9411,6 +9436,7 @@ DragPressureSensorEvent.type = 'drag:pressure';
 /* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -9527,6 +9553,7 @@ exports.default = AbstractEvent;
 /* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -9542,6 +9569,7 @@ exports.default = _TouchSensor2.default;
 /***/ }),
 /* 127 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -9838,6 +9866,7 @@ function onContextMenu(event) {
 /* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -9853,6 +9882,7 @@ exports.default = _DragSensor2.default;
 /***/ }),
 /* 129 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -10178,6 +10208,7 @@ exports.default = DragSensor;
 /* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -10193,6 +10224,7 @@ exports.default = _ForceTouchSensor2.default;
 /***/ }),
 /* 131 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -10530,6 +10562,7 @@ exports.default = ForceTouchSensor;
 /* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -10552,6 +10585,7 @@ Object.defineProperty(exports, 'DraggableDestroyEvent', {
 /***/ }),
 /* 133 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -10659,6 +10693,7 @@ DraggableDestroyEvent.type = 'draggable:destroy';
 /* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -10717,6 +10752,7 @@ Object.defineProperty(exports, 'DragPressureEvent', {
 /***/ }),
 /* 135 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -11128,6 +11164,7 @@ DragStopEvent.type = 'drag:stop';
 /* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -11168,6 +11205,7 @@ Object.defineProperty(exports, 'MirrorDestroyEvent', {
 /***/ }),
 /* 137 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -11461,6 +11499,7 @@ MirrorDestroyEvent.cancelable = true;
 /* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -11495,6 +11534,7 @@ Object.defineProperty(exports, 'SortableStopEvent', {
 /***/ }),
 /* 139 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -11895,6 +11935,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 exports.__esModule = true;
 
 exports.default = function (instance, Constructor) {
@@ -11906,6 +11947,7 @@ exports.default = function (instance, Constructor) {
 /***/ }),
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 exports.__esModule = true;
 
@@ -11937,6 +11979,7 @@ exports.default = function () {
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 exports.__esModule = true;
 
 var _typeof2 = __webpack_require__(49);
@@ -11956,6 +11999,7 @@ exports.default = function (self, call) {
 /***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 exports.__esModule = true;
 
@@ -12191,6 +12235,7 @@ module.exports = {};
 /* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -12207,6 +12252,7 @@ exports.closest = _closest2.default;
 /***/ }),
 /* 18 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -12258,6 +12304,7 @@ module.exports = function(key){
 /* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -12298,6 +12345,7 @@ Object.defineProperty(exports, 'DragPressureSensorEvent', {
 /***/ }),
 /* 23 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -12509,6 +12557,7 @@ exports.f = {}.propertyIsEnumerable;
 /* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -12524,6 +12573,7 @@ exports.default = _AbstractPlugin2.default;
 /***/ }),
 /* 39 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 exports.__esModule = true;
 
@@ -12713,6 +12763,7 @@ module.exports = function(it){
 /* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -12741,6 +12792,7 @@ exports.Accessibility = _Accessibility2.default;
 /***/ }),
 /* 49 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 exports.__esModule = true;
 
@@ -12805,6 +12857,7 @@ exports.f = __webpack_require__(8) ? gOPD : function getOwnPropertyDescriptor(O,
 /* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -12825,6 +12878,7 @@ exports.default = _Draggable2.default;
 /***/ }),
 /* 54 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -13810,7 +13864,7 @@ var ctx            = __webpack_require__(27)
   , createProperty = __webpack_require__(69)
   , getIterFn      = __webpack_require__(70);
 
-$export($export.S + $export.F * !__webpack_require__(72)(function(iter){  }), 'Array', {
+$export($export.S + $export.F * !__webpack_require__(72)(function(iter){ }), 'Array', {
   // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
   from: function from(arrayLike/*, mapfn = undefined, thisArg = undefined*/){
     var O       = toObject(arrayLike)
@@ -13932,7 +13986,6 @@ var ITERATOR     = __webpack_require__(4)('iterator')
 try {
   var riter = [7][ITERATOR]();
   riter['return'] = function(){ SAFE_CLOSING = true; };
-  
 } catch(e){ /* empty */ }
 
 module.exports = function(exec, skipClosing){
@@ -13976,6 +14029,7 @@ $export($export.S + $export.F * !__webpack_require__(8), 'Object', {defineProper
 /* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -13991,6 +14045,7 @@ exports.default = _closest2.default;
 /***/ }),
 /* 77 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -14063,6 +14118,7 @@ function closest(element, value) {
 /* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -14080,6 +14136,7 @@ exports.defaultMirrorOptions = _Mirror.defaultOptions;
 /***/ }),
 /* 79 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -14353,6 +14410,7 @@ function withPromise(callback) {
 /* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 exports.__esModule = true;
 
 exports.default = function (obj, keys) {
@@ -14471,6 +14529,7 @@ module.exports = __webpack_require__(6).Symbol;
 /* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
+// ECMAScript 6 symbols shim
 var global         = __webpack_require__(5)
   , has            = __webpack_require__(9)
   , DESCRIPTORS    = __webpack_require__(8)
@@ -14930,6 +14989,7 @@ $export($export.S, 'Object', {create: __webpack_require__(29)});
 /* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -15001,6 +15061,7 @@ exports.default = AbstractPlugin;
 /* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -15018,6 +15079,7 @@ exports.defaultAutoScrollOptions = _AutoScroll.defaultOptions;
 /***/ }),
 /* 107 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15293,6 +15355,7 @@ function closestScrollableElement(element) {
 /* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -15308,6 +15371,7 @@ exports.default = _Accessibility2.default;
 /***/ }),
 /* 109 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15532,6 +15596,7 @@ function _onDragStop(_ref4) {
 /* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -15568,6 +15633,7 @@ exports.ForceTouchSensor = _ForceTouchSensor2.default;
 /***/ }),
 /* 111 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15680,6 +15746,7 @@ exports.default = Sensor;
 /* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -15695,6 +15762,7 @@ exports.default = _MouseSensor2.default;
 /***/ }),
 /* 113 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15951,6 +16019,7 @@ function preventNativeDragStart(event) {
 /* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -16163,6 +16232,7 @@ DragPressureSensorEvent.type = 'drag:pressure';
 /* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -16279,6 +16349,7 @@ exports.default = AbstractEvent;
 /* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -16294,6 +16365,7 @@ exports.default = _TouchSensor2.default;
 /***/ }),
 /* 117 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -16590,6 +16662,7 @@ function onContextMenu(event) {
 /* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -16605,6 +16678,7 @@ exports.default = _DragSensor2.default;
 /***/ }),
 /* 119 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -16930,6 +17004,7 @@ exports.default = DragSensor;
 /* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -16945,6 +17020,7 @@ exports.default = _ForceTouchSensor2.default;
 /***/ }),
 /* 121 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -17282,6 +17358,7 @@ exports.default = ForceTouchSensor;
 /* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -17304,6 +17381,7 @@ Object.defineProperty(exports, 'DraggableDestroyEvent', {
 /***/ }),
 /* 123 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -17411,6 +17489,7 @@ DraggableDestroyEvent.type = 'draggable:destroy';
 /* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -17469,6 +17548,7 @@ Object.defineProperty(exports, 'DragPressureEvent', {
 /***/ }),
 /* 125 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -17880,6 +17960,7 @@ DragStopEvent.type = 'drag:stop';
 /* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -17920,6 +18001,7 @@ Object.defineProperty(exports, 'MirrorDestroyEvent', {
 /***/ }),
 /* 127 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -18286,6 +18368,11 @@ class CompleteTable {
          */
         this.history = false;
         /**
+         * Holds the reference to indexed db
+         * @type {boolean}
+         */
+        this.__latestVersion = 1;
+        /**
          * Renders the editable HTML and prepares the editable behavior
          * @type {boolean}
          */
@@ -18390,7 +18477,7 @@ class CompleteTable {
     }
     updateColumnWidth(event) {
         const newState = this.pullResizableState(event);
-        console.log(this.__resizableState, newState);
+        console.log(newState);
     }
     destroyResizable() {
         if (!this.resizable && this.__resizable) {
@@ -18421,8 +18508,8 @@ class CompleteTable {
         this.__currentPageItems = undefined;
     }
     preparePages() {
-        const low = (this.__currentPage - 1) * this.items;
-        const high = ((this.__currentPage * this.items) - 1);
+        const low = (this.__currentPage) * this.items;
+        const high = (((this.__currentPage + 1) * this.items));
         this.__currentPageItems = this.data.list.slice(low, high);
     }
     updateCurrentPage(select) {
@@ -18488,11 +18575,30 @@ class CompleteTable {
         function overwriteMerge(destinationArray, sourceArray, options) {
             return sourceArray;
         }
-        this.data = deepmerge_1(this.data, data, { arrayMerge: overwriteMerge });
+        this.data = Object.assign({}, deepmerge_1(this.data, data, { arrayMerge: overwriteMerge }));
+        this.verifyRender(this.data.list);
         this.__selected = this.data.selected;
         if (this.history && this.__history) {
             this.__history.history.put(this.data);
+            this.__history.history.orderBy('version').last().then((lv) => {
+                this.__latestVersion = lv.version;
+            });
         }
+    }
+    verifyRender(state) {
+        Array.prototype.map.call(this.element.querySelectorAll('.tbody .tr'), (rowEl, rowIndex) => {
+            Array.prototype.map.call(rowEl.querySelectorAll('.td:not(.ignore)'), (colEl, columnIndex) => {
+                if (colEl.innerHTML !== state[rowIndex][columnIndex].content) {
+                    colEl.innerHTML = state[rowIndex][columnIndex].content;
+                }
+            });
+        });
+    }
+    undo() {
+        this.applyVersion(this.data.version - 1);
+    }
+    redo() {
+        this.applyVersion(this.data.version + 1);
     }
     handleVersionChange(e) {
         const version = e.target.value;
@@ -18515,11 +18621,11 @@ class CompleteTable {
     gatherData(table) {
         return __awaiter(this, void 0, void 0, function* () {
             var list = Array.prototype.map.call(table.querySelectorAll('tbody tr, .tbody .tr:not(.draggable--original):not(.draggable-mirror)'), (tr) => {
+                console.log(tr);
                 return Array.prototype.map.call(tr.querySelectorAll('td:not(.ignore),th:not(.ignore),.td:not(.ignore),.th:not(.ignore)'), (td) => {
                     return this.sanitizeTD(td);
                 });
             });
-            console.log(list);
             this.updateData({
                 version: this.data.version + 1,
                 list: list,
@@ -18557,17 +18663,18 @@ class CompleteTable {
                 list: updates,
                 selected: this.__selected
             });
-            // @ts-ignore
-            e.target.parentElement.classList.remove('editing');
-            // @ts-ignore
-            e.target.parentElement.innerHTML = e.target.value;
+            this.updateData({
+                version: this.data.version,
+                list: updates,
+                selected: this.__selected
+            });
         };
         return input;
     }
     handleCellDoubleClick(e, value) {
         const item = e.target;
-        const row = parseInt(item.parentNode.dataset.index);
-        const column = parseInt(item.dataset.index);
+        const row = parseInt(item.dataset.row);
+        const column = parseInt(item.dataset.column);
         e.target.innerHTML = "";
         item.appendChild(this.createEditableItem(row, column, value));
         item.classList.add('editing');
@@ -18600,13 +18707,10 @@ class CompleteTable {
     // Render Methods
     renderDragTab() {
         return (h("div", { class: "td small ignore" },
-            h("button", { class: "drag-handle" })));
+            h("button", { class: "drag-handle" }, "\u2630")));
     }
     renderSelectColumn(row) {
-        console.log(row[0]);
-        return (
-        // @ts-ignore
-        h("div", { class: "td small ignore" },
+        return (h("div", { class: "td small ignore" },
             h("input", { type: "checkbox", class: "single", value: row[0].id, checked: this.valueSelected(row[0].id), onChange: (e) => { this.handleSelectOne(e, row[0].id); } })));
     }
     renderHeaderDragTab() {
@@ -18614,18 +18718,17 @@ class CompleteTable {
     }
     renderHeaderHistoryColumn() {
         return (h("div", { class: "th" },
-            h("input", { type: "number", value: this.data.version, onChange: (e) => { this.handleVersionChange(e); } })));
+            h("input", { type: "number", readonly: true, value: this.data.version, onChange: (e) => { this.handleVersionChange(e); } }),
+            h("button", { onClick: () => { this.undo(); }, disabled: (this.data.version <= 1) }, "undo"),
+            h("button", { onClick: () => { this.redo(); }, disabled: (this.data.version >= this.__latestVersion && this.data.version === this.__latestVersion) }, "redo")));
     }
     renderHeaderSelectColumn() {
         if (this.pagination) {
-            return (
-            // @ts-ignore
-            h("div", { class: "th small ignore" }));
+            return (h("div", { class: "th small ignore" }));
         }
         else {
-            return (
             // @ts-ignore
-            h("div", { class: "th small ignore" },
+            return (h("div", { class: "th small ignore" },
                 h("input", { type: "checkbox", class: "all", indeterminate: this.__selected.length !== this.data.list.length && this.__selected.length !== 0, checked: this.__selected.length === this.data.list.length, onChange: (e) => { this.handleSelectAll(e); } })));
         }
     }
@@ -18649,24 +18752,24 @@ class CompleteTable {
     }
     renderTableBody() {
         return (h("div", { class: "tbody" },
-            this.pagination && this.__currentPageItems && this.__currentPageItems.map((row, index) => {
-                return this.renderTableRow(row, index);
+            this.pagination && this.__currentPageItems && this.__currentPageItems.map((row, rowIndex) => {
+                return this.renderTableRow(row, rowIndex);
             }),
-            !this.pagination && this.data.list.map((row, index) => {
-                return this.renderTableRow(row, index);
+            !this.pagination && this.data.list.map((row, rowIndex) => {
+                return this.renderTableRow(row, rowIndex);
             })));
     }
-    renderTableRow(row, index) {
+    renderTableRow(row, rowIndex) {
         const selected = (this.valueSelected(row[0].id)) ? 'selected' : '';
-        return (h("div", { class: `tr ${selected}`, "data-id": row[0].id, "data-index": index, "data-version": this.data.version },
+        return (h("div", { class: `tr ${selected}`, "data-id": row[0].id, "data-row": rowIndex, "data-version": this.data.version },
             this.sortable && this.renderDragTab(),
             this.selectable && this.renderSelectColumn(row),
-            row.map((item, index) => {
-                return this.renderTableCell(item, index);
+            row.map((item, columnIndex) => {
+                return this.renderTableCell(item, columnIndex, rowIndex);
             })));
     }
-    renderTableCell(item, index) {
-        return (h("div", { class: "td", "data-index": index, innerHTML: item.content, onDblClick: (e) => { this.handleCellDoubleClick(e, item.content); } }));
+    renderTableCell(item, columnIndex, rowIndex) {
+        return (h("div", { class: "td", "data-column": columnIndex, "data-row": rowIndex, innerHTML: item.content, "data-value": item.content, onDblClick: (e) => { this.handleCellDoubleClick(e, item.content); } }));
     }
     renderPageSelect() {
         return (h("div", { class: "td" },
@@ -18690,18 +18793,18 @@ class CompleteTable {
     render() {
         return (
         // @ts-ignore
-        h("div", { class: "table", name: this.__name },
+        h("div", { class: "table", name: this.__name, tabindex: "0" },
             h("div", { class: "tr options" },
-                this.history && this.renderHeaderHistoryColumn(),
                 this.pagination && this.renderPageSelect(),
-                this.pagination && this.renderPageSelectNumber()),
+                this.pagination && this.renderPageSelectNumber(),
+                this.history && this.renderHeaderHistoryColumn()),
             this.renderTableHead(),
             this.renderTableBody(),
             this.selectable && this.renderSelectedItems()));
     }
     static get is() { return "complete-table"; }
-    static get properties() { return { "__currentPage": { "state": true }, "__currentPageItems": { "state": true }, "__history": { "state": true }, "__name": { "state": true }, "__pageArray": { "state": true }, "__pageCount": { "state": true }, "__resizable": { "state": true }, "__resizableState": { "state": true }, "__selected": { "state": true }, "__sortable": { "state": true }, "columns": { "state": true }, "data": { "state": true }, "density": { "type": "Any", "attr": "density" }, "editable": { "type": Boolean, "attr": "editable", "watchCallbacks": ["observeEditable"] }, "element": { "elementRef": true }, "expandable": { "type": Boolean, "attr": "expandable" }, "expandInto": { "type": "Any", "attr": "expand-into" }, "filterable": { "type": Boolean, "attr": "filterable" }, "history": { "type": Boolean, "attr": "history", "watchCallbacks": ["observeHistory"] }, "items": { "type": Number, "attr": "items" }, "pagination": { "type": Boolean, "attr": "pagination", "watchCallbacks": ["observePagination"] }, "readability": { "type": "Any", "attr": "readability" }, "resizable": { "type": Boolean, "attr": "resizable", "watchCallbacks": ["observeResizeable"] }, "searchable": { "type": Boolean, "attr": "searchable" }, "selectable": { "type": Boolean, "attr": "selectable" }, "sortable": { "type": Boolean, "attr": "sortable", "watchCallbacks": ["observeSortable"] }, "state": { "method": true }, "sticky": { "type": Boolean, "attr": "sticky" }, "updateData": { "method": true } }; }
-    static get style() { return "complete-table {\n  --table-border-color: rgba(0,0,0,0.2);\n  --table-box-shadow: rgba(0,0,0,0.15);\n  --table-background: white;\n  --table-off-color: rgba(0,0,0,0.05);\n  --table-selected-color: rgba(0,0,0,0.075);\n  --table-compact: 4px 2px;\n  --table-cozy: 6px 4px;\n  --table-comfortable: 8px 6px;\n  --table-font-size: 1.6rem;\n  display: block;\n  box-sizing: border-box;\n}\n\ncomplete-table table {\n  display: none;\n}\n\ncomplete-table * {\n  box-sizing: border-box;\n}\n\ncomplete-table .table {\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  border: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .table {\n  flex: auto 1;\n  display: flex;\n  flex-direction: column;\n  align-items: stretch;\n  width: 100%;\n  border-collapse: collapse;\n  overflow: auto;\n}\n\ncomplete-table .table .thead {\n  flex: 1 0 auto;\n  display: flex;\n  flex-direction: column;\n  -webkit-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n\ncomplete-table .table .thead.-headerGroups {\n  background: rgba(0,0,0,0.03);\n  border-bottom: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .thead.-filters {\n  border-bottom: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .thead.-filters input,\ncomplete-table .table .thead.-filters select {\n  border: 1px solid var(--table-border-color);\n  background: #fff;\n  padding: 5px 7px;\n  font-size: inherit;\n  border-radius: 3px;\n  font-weight: normal;\n  outline: none;\n}\n\ncomplete-table .table .thead.-filters .th {\n  border-right: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .thead.-header {\n  box-shadow: 0 2px 15px 0px var(--table-box-shadow);\n}\n\ncomplete-table .table .thead .tr {\n  text-align: center;\n}\n\ncomplete-table .table .thead .th,\ncomplete-table .table .thead .td {\n  padding: 5px 5px;\n  line-height: normal;\n  position: relative;\n  border-right: 1px solid var(--table-border-color);\n  transition: box-shadow 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);\n  box-shadow: inset 0 0 0 0 transparent;\n  min-width: 50px;\n}\n\ncomplete-table .table .thead .th.-soasc,\ncomplete-table .table .thead .td.-soasc {\n  box-shadow: inset 0 3px 0 0 var(--table-box-shadow);\n}\n\ncomplete-table .table .thead .th.-sodesc,\ncomplete-table .table .thead .td.-sodesc {\n  box-shadow: inset 0 -3px 0 0 var(--table-box-shadow);\n}\n\ncomplete-table .table .thead .th.-cursor-pointer,\ncomplete-table .table .thead .td.-cursor-pointer {\n  cursor: pointer;\n}\n\ncomplete-table .table .thead .th:last-child,\ncomplete-table .table .thead .td:last-child {\n  border-right: 0;\n}\n\ncomplete-table .table .thead .resizable-header {\n  overflow: visible;\n}\n\ncomplete-table .table .thead .resizable-header:last-child {\n  overflow: hidden;\n}\n\ncomplete-table .table .thead .resizable-header-content {\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n\ncomplete-table .table .thead .header-pivot {\n  border-right-color: var(--table-border-color);\n}\n\ncomplete-table .table .thead .header-pivot::after,\ncomplete-table .table .thead .header-pivot::before {\n  left: 100%;\n  top: 50%;\n  border: solid transparent;\n  content: \" \";\n  height: 0;\n  width: 0;\n  position: absolute;\n  pointer-events: none;\n}\n\ncomplete-table .table .thead .header-pivot::after {\n  border-color: rgba(255,255,255,0);\n  border-left-color: #fff;\n  border-width: 8px;\n  margin-top: -8px;\n}\n\ncomplete-table .table .thead .header-pivot::before {\n  border-color: rgba(102,102,102,0);\n  border-left-color: var(--table-border-color);\n  border-width: 10px;\n  margin-top: -10px;\n}\n\ncomplete-table .table .tbody {\n  flex: 99999 1 auto;\n  display: flex;\n  flex-direction: column;\n  overflow: auto;\n}\n\ncomplete-table .table .tbody .tr-group {\n  border-bottom: solid 1px var(--table-border-color);\n}\n\ncomplete-table .table .tbody .tr-group:last-child {\n  border-bottom: 0;\n}\n\ncomplete-table .table .tbody .td {\n  border-right: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .tbody .td:last-child {\n  border-right: 0;\n}\n\ncomplete-table .table .tbody .expandable {\n  cursor: pointer;\n}\n\ncomplete-table .table .tr-group {\n  flex: 1 0 auto;\n  display: flex;\n  flex-direction: column;\n  align-items: stretch;\n}\n\ncomplete-table .table .tr {\n  flex: 1 0 auto;\n  display: inline-flex;\n}\n\ncomplete-table .table .th,\ncomplete-table .table .td {\n  flex: 1 0 0px;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  padding: 7px 5px;\n  overflow: hidden;\n  transition: 0.3s ease;\n  transition-property: width, min-width, padding, opacity;\n  font-size: var(--font-size);\n}\n\ncomplete-table[density=\"comfortable\"] .table .th,\ncomplete-table[density=\"comfortable\"] .table .td {\n  padding: var(--table-comfortable);\n}\n\ncomplete-table[density=\"cozy\"] .table .th,\ncomplete-table[density=\"cozy\"] .table .td {\n  padding: var(--table-cozy);\n}\n\ncomplete-table[density=\"compact\"] .table .th,\ncomplete-table[density=\"compact\"] .table .td {\n  padding: var(--table-compact);\n}\n\ncomplete-table .table .th.-hidden,\ncomplete-table .table .td.-hidden {\n  width: 0 !important;\n  min-width: 0 !important;\n  padding: 0 !important;\n  border: 0 !important;\n  opacity: 0 !important;\n}\n\ncomplete-table .table .expander {\n  display: inline-block;\n  position: relative;\n  margin: 0;\n  color: transparent;\n  margin: 0 10px;\n}\n\ncomplete-table .table .expander::after {\n  content: '';\n  position: absolute;\n  width: 0;\n  height: 0;\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%) rotate(-90deg);\n  border-left: 5.04px solid transparent;\n  border-right: 5.04px solid transparent;\n  border-top: 7px solid var(--table-border-color);\n  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);\n  cursor: pointer;\n}\n\ncomplete-table .table .expander.-open::after {\n  transform: translate(-50%, -50%) rotate(0deg);\n}\n\ncomplete-table .table .tfoot {\n  flex: 1 0 auto;\n  display: flex;\n  flex-direction: column;\n  box-shadow: 0 0px 15px 0px rgba(0,0,0,0.15);\n}\n\ncomplete-table .table .tfoot .td {\n  border-right: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .tfoot .td:last-child {\n  border-right: 0;\n}\n\ncomplete-table .table.-striped .tr.-odd {\n  background: rgba(0,0,0,0.03);\n}\n\ncomplete-table .table.-highlight .tbody .tr:not(.-padRow):hover {\n  background: rgba(0,0,0,0.05);\n}\n\ncomplete-table .table .-pagination {\n  z-index: 1;\n  display: flex;\n  justify-content: space-between;\n  align-items: stretch;\n  flex-wrap: wrap;\n  padding: 3px;\n  box-shadow: 0 0px 15px 0px rgba(0,0,0,0.1);\n  border-top: 2px solid var(--table-border-color);\n}\n\ncomplete-table .table .-pagination input,\ncomplete-table .table .-pagination select {\n  border: 1px solid var(--table-border-color);\n  background: #fff;\n  padding: 5px 7px;\n  font-size: inherit;\n  border-radius: 3px;\n  font-weight: normal;\n  outline: none;\n}\n\ncomplete-table .table .-pagination .-btn {\n  appearance: none;\n  display: block;\n  width: 100%;\n  height: 100%;\n  border: 0;\n  border-radius: 3px;\n  padding: 6px;\n  font-size: 1em;\n  color: rgba(0,0,0,0.6);\n  background: rgba(0,0,0,0.1);\n  transition: all 0.1s ease;\n  cursor: pointer;\n  outline: none;\n}\n\ncomplete-table .table .-pagination .-btn[disabled] {\n  opacity: 0.5;\n  cursor: default;\n}\n\ncomplete-table .table .-pagination .-btn:not([disabled]):hover {\n  background: rgba(0,0,0,0.3);\n  color: #fff;\n}\n\ncomplete-table .table .-pagination .-previous,\ncomplete-table .table .-pagination .-next {\n  flex: 1;\n  text-align: center;\n}\n\ncomplete-table .table .-pagination .-center {\n  flex: 1.5;\n  text-align: center;\n  margin-bottom: 0;\n  display: flex;\n  flex-direction: row;\n  flex-wrap: wrap;\n  align-items: center;\n  justify-content: space-around;\n}\n\ncomplete-table .table .-pagination .-pageInfo {\n  display: inline-block;\n  margin: 3px 10px;\n  white-space: nowrap;\n}\n\ncomplete-table .table .-pagination .-pageJump {\n  display: inline-block;\n}\n\ncomplete-table .table .-pagination .-pageJump input {\n  width: 70px;\n  text-align: center;\n}\n\ncomplete-table .table .-pagination .-pageSizeOptions {\n  margin: 3px 10px;\n}\n\ncomplete-table .table .noData {\n  display: block;\n  position: absolute;\n  left: 50%;\n  top: 50%;\n  transform: translate(-50%, -50%);\n  background: rgba(255,255,255,0.8);\n  transition: all 0.3s ease;\n  z-index: 1;\n  pointer-events: none;\n  padding: 20px;\n  color: rgba(0,0,0,0.5);\n}\n\ncomplete-table .table .-loading {\n  display: block;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  background: rgba(255,255,255,0.8);\n  transition: all 0.3s ease;\n  z-index: -1;\n  opacity: 0;\n  pointer-events: none;\n}\n\ncomplete-table .table .-loading > div {\n  position: absolute;\n  display: block;\n  text-align: center;\n  width: 100%;\n  top: 50%;\n  left: 0;\n  font-size: 15px;\n  color: rgba(0,0,0,0.6);\n  transform: translateY(-52%);\n  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);\n}\n\ncomplete-table .table .-loading.-active {\n  opacity: 1;\n  z-index: 2;\n  pointer-events: all;\n}\n\ncomplete-table .table .-loading.-active > div {\n  transform: translateY(50%);\n}\n\ncomplete-table .table .resizing .th,\ncomplete-table .table .resizing .td {\n  transition: none !important;\n  cursor: col-resize;\n  user-select: none;\n}\n\ncomplete-table[sticky] .thead {\n  position: sticky;\n  top: 0;\n  background: white;\n}\n\ncomplete-table .table .small {\n  display:  flex;\n  align-items: center;\n  justify-content: center;\n  flex: 0 0 0px;\n  min-width: 28px !important;\n}\n\n/* Draggable */\ncomplete-table .table .draggable-mirror {\n  width: inherit;\n  flex: inherit;\n  cursor: -webkit-grabbing;\n  cursor: grabbing;\n  position:  absolute !important;\n  width: 100%;\n  border: 1px solid var(--table-border-color);\n  background: var(--table-background);\n}\n\nbody.draggable--is-dragging {\n  cursor: -webkit-grabbing !important;\n  cursor: grabbing !important;\n  position: relative !important;\n}\n\ncomplete-table .table .drag-handle:hover {\n  cursor: -webkit-grab;\n  cursor: grab;\n}\n\nbody.draggable--is-dragging complete-table .table .drag-handle {\n  cursor: -webkit-grabbing;\n  cursor: grabbing;\n}\n\n\n/* Resizable */\ncomplete-table .table .resize-handle {\n  display: inline-block;\n  position: absolute;\n  width: 36px;\n  top: 0;\n  bottom: 0;\n  right: -18px;\n  cursor: col-resize;\n  z-index: 10;\n}\n\ncomplete-table .resizable-mirror {\n  display: none;\n}\n\n/* Readability */\ncomplete-table[readability] .tr {\n  transition: background 300ms ease 0s;\n}\n\ncomplete-table[readability=\"border\"] .tr {\n  border-bottom: 1px solid var(--table-border-color);\n}\n\ncomplete-table[readability=\"even\"] .table .tbody .tr:nth-child(even) {\n  background: var(--table-off-color);\n}\n\ncomplete-table[readability=\"odd\"] .table .tbody .tr:nth-child(odd) {\n  background: var(--table-off-color);\n}\n\n\ncomplete-table .selected {\n  background: var(--table-selected-color) !important;\n}"; }
+    static get properties() { return { "__currentPage": { "state": true }, "__currentPageItems": { "state": true }, "__history": { "state": true }, "__latestVersion": { "state": true }, "__name": { "state": true }, "__pageArray": { "state": true }, "__pageCount": { "state": true }, "__resizable": { "state": true }, "__resizableState": { "state": true }, "__selected": { "state": true }, "__sortable": { "state": true }, "columns": { "state": true }, "data": { "state": true }, "density": { "type": "Any", "attr": "density" }, "editable": { "type": Boolean, "attr": "editable", "watchCallbacks": ["observeEditable"] }, "element": { "elementRef": true }, "expandable": { "type": Boolean, "attr": "expandable" }, "expandInto": { "type": "Any", "attr": "expand-into" }, "filterable": { "type": Boolean, "attr": "filterable" }, "history": { "type": Boolean, "attr": "history", "watchCallbacks": ["observeHistory"] }, "items": { "type": Number, "attr": "items" }, "pagination": { "type": Boolean, "attr": "pagination", "watchCallbacks": ["observePagination"] }, "readability": { "type": "Any", "attr": "readability" }, "redo": { "method": true }, "resizable": { "type": Boolean, "attr": "resizable", "watchCallbacks": ["observeResizeable"] }, "searchable": { "type": Boolean, "attr": "searchable" }, "selectable": { "type": Boolean, "attr": "selectable" }, "sortable": { "type": Boolean, "attr": "sortable", "watchCallbacks": ["observeSortable"] }, "state": { "method": true }, "sticky": { "type": Boolean, "attr": "sticky" }, "undo": { "method": true }, "updateData": { "method": true } }; }
+    static get style() { return "complete-table {\n  --table-border-color: rgba(0,0,0,0.2);\n  --table-box-shadow: rgba(0,0,0,0.15);\n  --table-background: white;\n  --table-off-color: rgba(0,0,0,0.05);\n  --table-selected-color: rgba(0,0,0,0.075);\n  --table-compact: 4px 2px;\n  --table-cozy: 6px 4px;\n  --table-comfortable: 8px 6px;\n  --table-font-size: 1.6rem;\n  display: block;\n  box-sizing: border-box;\n}\n\ncomplete-table table {\n  display: none;\n}\n\ncomplete-table * {\n  box-sizing: border-box;\n}\n\ncomplete-table .table {\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  border: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .table {\n  flex: auto 1;\n  display: flex;\n  flex-direction: column;\n  align-items: stretch;\n  width: 100%;\n  border-collapse: collapse;\n  overflow: auto;\n}\n\ncomplete-table .table .thead {\n  flex: 1 0 auto;\n  display: flex;\n  flex-direction: column;\n  -webkit-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n\ncomplete-table .table .thead.-headerGroups {\n  background: rgba(0,0,0,0.03);\n  border-bottom: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .thead.-filters {\n  border-bottom: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .thead.-filters input,\ncomplete-table .table .thead.-filters select {\n  border: 1px solid var(--table-border-color);\n  background: #fff;\n  padding: 5px 7px;\n  font-size: inherit;\n  border-radius: 3px;\n  font-weight: normal;\n  outline: none;\n}\n\ncomplete-table .table .thead.-filters .th {\n  border-right: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .thead.-header {\n  box-shadow: 0 2px 15px 0px var(--table-box-shadow);\n}\n\ncomplete-table .table .thead .tr {\n  text-align: center;\n}\n\ncomplete-table .table .thead .tr .th {\n  border-bottom: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .tr.options {\n  border-bottom: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .tr.options p {\n  margin: 0;\n}\n\n\ncomplete-table .table .thead .th,\ncomplete-table .table .thead .td {\n  padding: 5px 5px;\n  line-height: normal;\n  position: relative;\n  border-right: 1px solid var(--table-border-color);\n  transition: box-shadow 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);\n  box-shadow: inset 0 0 0 0 transparent;\n  min-width: 50px;\n}\n\ncomplete-table .table .thead .th.-soasc,\ncomplete-table .table .thead .td.-soasc {\n  box-shadow: inset 0 3px 0 0 var(--table-box-shadow);\n}\n\ncomplete-table .table .thead .th.-sodesc,\ncomplete-table .table .thead .td.-sodesc {\n  box-shadow: inset 0 -3px 0 0 var(--table-box-shadow);\n}\n\ncomplete-table .table .thead .th.-cursor-pointer,\ncomplete-table .table .thead .td.-cursor-pointer {\n  cursor: pointer;\n}\n\ncomplete-table .table .thead .th:last-child,\ncomplete-table .table .thead .td:last-child {\n  border-right: 0;\n}\n\ncomplete-table .table .thead .resizable-header {\n  overflow: visible;\n}\n\ncomplete-table .table .thead .resizable-header:last-child {\n  overflow: hidden;\n}\n\ncomplete-table .table .thead .resizable-header-content {\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n\ncomplete-table .table .thead .header-pivot {\n  border-right-color: var(--table-border-color);\n}\n\ncomplete-table .table .thead .header-pivot::after,\ncomplete-table .table .thead .header-pivot::before {\n  left: 100%;\n  top: 50%;\n  border: solid transparent;\n  content: \" \";\n  height: 0;\n  width: 0;\n  position: absolute;\n  pointer-events: none;\n}\n\ncomplete-table .table .thead .header-pivot::after {\n  border-color: rgba(255,255,255,0);\n  border-left-color: #fff;\n  border-width: 8px;\n  margin-top: -8px;\n}\n\ncomplete-table .table .thead .header-pivot::before {\n  border-color: rgba(102,102,102,0);\n  border-left-color: var(--table-border-color);\n  border-width: 10px;\n  margin-top: -10px;\n}\n\ncomplete-table .table .tbody {\n  flex: 99999 1 auto;\n  display: flex;\n  flex-direction: column;\n  overflow: auto;\n}\n\ncomplete-table .table .tbody .tr-group {\n  border-bottom: solid 1px var(--table-border-color);\n}\n\ncomplete-table .table .tbody .tr-group:last-child {\n  border-bottom: 0;\n}\n\ncomplete-table .table .tbody .td {\n  border-right: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .tbody .td:last-child {\n  border-right: 0;\n}\n\ncomplete-table .table .tbody .expandable {\n  cursor: pointer;\n}\n\ncomplete-table .table .tr-group {\n  flex: 1 0 auto;\n  display: flex;\n  flex-direction: column;\n  align-items: stretch;\n}\n\ncomplete-table .table .tr {\n  flex: 1 0 auto;\n  display: inline-flex;\n}\n\ncomplete-table .table .th,\ncomplete-table .table .td {\n  flex: 1 0 0px;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  padding: 7px 5px;\n  overflow: hidden;\n  transition: 0.3s ease;\n  transition-property: width, min-width, padding, opacity;\n  font-size: var(--font-size);\n}\n\ncomplete-table[density=\"comfortable\"] .table .th,\ncomplete-table[density=\"comfortable\"] .table .td {\n  padding: var(--table-comfortable);\n}\n\ncomplete-table[density=\"cozy\"] .table .th,\ncomplete-table[density=\"cozy\"] .table .td {\n  padding: var(--table-cozy);\n}\n\ncomplete-table[density=\"compact\"] .table .th,\ncomplete-table[density=\"compact\"] .table .td {\n  padding: var(--table-compact);\n}\n\ncomplete-table .table .th.-hidden,\ncomplete-table .table .td.-hidden {\n  width: 0 !important;\n  min-width: 0 !important;\n  padding: 0 !important;\n  border: 0 !important;\n  opacity: 0 !important;\n}\n\ncomplete-table .table .expander {\n  display: inline-block;\n  position: relative;\n  margin: 0;\n  color: transparent;\n  margin: 0 10px;\n}\n\ncomplete-table .table .expander::after {\n  content: '';\n  position: absolute;\n  width: 0;\n  height: 0;\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%) rotate(-90deg);\n  border-left: 5.04px solid transparent;\n  border-right: 5.04px solid transparent;\n  border-top: 7px solid var(--table-border-color);\n  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);\n  cursor: pointer;\n}\n\ncomplete-table .table .expander.-open::after {\n  transform: translate(-50%, -50%) rotate(0deg);\n}\n\ncomplete-table .table .tfoot {\n  flex: 1 0 auto;\n  display: flex;\n  flex-direction: column;\n  box-shadow: 0 0px 15px 0px rgba(0,0,0,0.15);\n}\n\ncomplete-table .table .tfoot .td {\n  border-right: 1px solid var(--table-border-color);\n}\n\ncomplete-table .table .tfoot .td:last-child {\n  border-right: 0;\n}\n\ncomplete-table .table.-striped .tr.-odd {\n  background: rgba(0,0,0,0.03);\n}\n\ncomplete-table .table.-highlight .tbody .tr:not(.-padRow):hover {\n  background: rgba(0,0,0,0.05);\n}\n\ncomplete-table .table .-pagination {\n  z-index: 1;\n  display: flex;\n  justify-content: space-between;\n  align-items: stretch;\n  flex-wrap: wrap;\n  padding: 3px;\n  box-shadow: 0 0px 15px 0px rgba(0,0,0,0.1);\n  border-top: 2px solid var(--table-border-color);\n}\n\ncomplete-table .table .-pagination input,\ncomplete-table .table .-pagination select {\n  border: 1px solid var(--table-border-color);\n  background: #fff;\n  padding: 5px 7px;\n  font-size: inherit;\n  border-radius: 3px;\n  font-weight: normal;\n  outline: none;\n}\n\ncomplete-table .table .-pagination .-btn {\n  appearance: none;\n  display: block;\n  width: 100%;\n  height: 100%;\n  border: 0;\n  border-radius: 3px;\n  padding: 6px;\n  font-size: 1em;\n  color: rgba(0,0,0,0.6);\n  background: rgba(0,0,0,0.1);\n  transition: all 0.1s ease;\n  cursor: pointer;\n  outline: none;\n}\n\ncomplete-table .table .-pagination .-btn[disabled] {\n  opacity: 0.5;\n  cursor: default;\n}\n\ncomplete-table .table .-pagination .-btn:not([disabled]):hover {\n  background: rgba(0,0,0,0.3);\n  color: #fff;\n}\n\ncomplete-table .table .-pagination .-previous,\ncomplete-table .table .-pagination .-next {\n  flex: 1;\n  text-align: center;\n}\n\ncomplete-table .table .-pagination .-center {\n  flex: 1.5;\n  text-align: center;\n  margin-bottom: 0;\n  display: flex;\n  flex-direction: row;\n  flex-wrap: wrap;\n  align-items: center;\n  justify-content: space-around;\n}\n\ncomplete-table .table .-pagination .-pageInfo {\n  display: inline-block;\n  margin: 3px 10px;\n  white-space: nowrap;\n}\n\ncomplete-table .table .-pagination .-pageJump {\n  display: inline-block;\n}\n\ncomplete-table .table .-pagination .-pageJump input {\n  width: 70px;\n  text-align: center;\n}\n\ncomplete-table .table .-pagination .-pageSizeOptions {\n  margin: 3px 10px;\n}\n\ncomplete-table .table .noData {\n  display: block;\n  position: absolute;\n  left: 50%;\n  top: 50%;\n  transform: translate(-50%, -50%);\n  background: rgba(255,255,255,0.8);\n  transition: all 0.3s ease;\n  z-index: 1;\n  pointer-events: none;\n  padding: 20px;\n  color: rgba(0,0,0,0.5);\n}\n\ncomplete-table .table .-loading {\n  display: block;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  background: rgba(255,255,255,0.8);\n  transition: all 0.3s ease;\n  z-index: -1;\n  opacity: 0;\n  pointer-events: none;\n}\n\ncomplete-table .table .-loading > div {\n  position: absolute;\n  display: block;\n  text-align: center;\n  width: 100%;\n  top: 50%;\n  left: 0;\n  font-size: 15px;\n  color: rgba(0,0,0,0.6);\n  transform: translateY(-52%);\n  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);\n}\n\ncomplete-table .table .-loading.-active {\n  opacity: 1;\n  z-index: 2;\n  pointer-events: all;\n}\n\ncomplete-table .table .-loading.-active > div {\n  transform: translateY(50%);\n}\n\ncomplete-table .table .resizing .th,\ncomplete-table .table .resizing .td {\n  transition: none !important;\n  cursor: col-resize;\n  user-select: none;\n}\n\ncomplete-table[sticky] .thead {\n  position: sticky;\n  top: 0;\n  background: white;\n}\n\ncomplete-table .table .small {\n  display:  flex;\n  align-items: center;\n  justify-content: center;\n  flex: 0 0 0px;\n  min-width: 28px !important;\n}\n\n/* Draggable */\ncomplete-table .table .draggable-mirror {\n  width: inherit;\n  flex: inherit;\n  cursor: -webkit-grabbing;\n  cursor: grabbing;\n  position:  absolute !important;\n  width: 100%;\n  border: 1px solid var(--table-border-color);\n  background: var(--table-background);\n}\n\nbody.draggable--is-dragging {\n  cursor: -webkit-grabbing !important;\n  cursor: grabbing !important;\n  position: relative !important;\n}\n\ncomplete-table .table .drag-handle {\n  appearance: none;\n  -webkit-appearance: none;\n  border: 0;\n}\n\ncomplete-table .table .drag-handle:hover {\n  cursor: -webkit-grab;\n  cursor: grab;\n}\n\nbody.draggable--is-dragging complete-table .table .drag-handle {\n  cursor: -webkit-grabbing;\n  cursor: grabbing;\n}\n\n\n/* Resizable */\ncomplete-table .table .resize-handle {\n  display: inline-block;\n  position: absolute;\n  width: 36px;\n  top: 0;\n  bottom: 0;\n  right: -18px;\n  cursor: col-resize;\n  z-index: 10;\n}\n\ncomplete-table .resizable-mirror {\n  display: none;\n}\n\n/* Readability */\ncomplete-table[readability] .tr {\n  transition: background 300ms ease 0s;\n}\n\ncomplete-table[readability=\"border\"] .tr {\n  border-bottom: 1px solid var(--table-border-color);\n}\n\ncomplete-table[readability=\"even\"] .table .tbody .tr:nth-child(even) {\n  background: var(--table-off-color);\n}\n\ncomplete-table[readability=\"odd\"] .table .tbody .tr:nth-child(odd) {\n  background: var(--table-off-color);\n}\n\n\ncomplete-table .selected {\n  background: var(--table-selected-color) !important;\n}"; }
 }
 
 export { CompleteTable };

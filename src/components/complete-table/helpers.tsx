@@ -1,15 +1,12 @@
-// export class Drag {
-//   constructor(element: HTMLElement, options: {}) {
+declare interface CompleteTableCell {
+  content: string;
+  name?: string;
+  id?: string;
+  selected?: boolean;
+}
 
-//   }
-
-
-//   destroy () {
-//   }
-// }
-
-
-// interface DragOptions {
-//   draggable: string;
-//   handle: string;
-// }
+declare interface CompleteTableDataModel {
+  version: number;
+  list: Array<Array<Object>>;
+  selected: Array<number>;
+}

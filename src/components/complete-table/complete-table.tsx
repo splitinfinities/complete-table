@@ -119,6 +119,12 @@ export class CompleteTable {
   @State() __history: any;
 
   /**
+   * Holds the reference to indexed db
+   * @type {boolean}
+   */
+  @State() __latestVersion: number = 1;
+
+  /**
    * Renders the editable HTML and prepares the editable behavior
    * @type {boolean}
    */
@@ -194,8 +200,6 @@ export class CompleteTable {
     this.gatherData(this.element);
   }
 
-
-
   /**
    * Resizable
    */
@@ -246,7 +250,7 @@ export class CompleteTable {
 
   updateColumnWidth(event) {
     const newState = this.pullResizableState(event);
-    console.log(this.__resizableState, newState);
+    console.log(newState);
   }
 
   destroyResizable () {
@@ -284,8 +288,8 @@ export class CompleteTable {
   }
 
   preparePages() {
-    const low = (this.__currentPage - 1) * this.items;
-    const high = ((this.__currentPage * this.items) - 1);
+    const low = (this.__currentPage) * this.items;
+    const high = (((this.__currentPage + 1) * this.items));
     this.__currentPageItems = this.data.list.slice(low, high);
   }
 
@@ -372,13 +376,38 @@ export class CompleteTable {
         return sourceArray
     }
 
-    this.data = merge(this.data, data, { arrayMerge: overwriteMerge });
+    this.data = {...merge(this.data, data, { arrayMerge: overwriteMerge })};
+
+    this.verifyRender(this.data.list);
 
     this.__selected = this.data.selected;
 
     if (this.history && this.__history) {
       this.__history.history.put(this.data);
+      this.__history.history.orderBy('version').last().then((lv) => {
+        this.__latestVersion = lv.version;
+      });
     }
+  }
+
+  verifyRender(state) {
+    Array.prototype.map.call(this.element.querySelectorAll('.tbody .tr'), (rowEl, rowIndex) => {
+      Array.prototype.map.call(rowEl.querySelectorAll('.td:not(.ignore)'), (colEl, columnIndex) => {
+          if (colEl.innerHTML !== state[rowIndex][columnIndex].content) {
+            colEl.innerHTML = state[rowIndex][columnIndex].content;
+          }
+      });
+    });
+  }
+
+  @Method()
+  undo() {
+    this.applyVersion(this.data.version - 1);
+  }
+
+  @Method()
+  redo() {
+    this.applyVersion(this.data.version + 1);
   }
 
   handleVersionChange(e) {
@@ -405,12 +434,11 @@ export class CompleteTable {
 
   async gatherData (table: HTMLTableElement|HTMLElement) {
     var list = Array.prototype.map.call(table.querySelectorAll('tbody tr, .tbody .tr:not(.draggable--original):not(.draggable-mirror)'), (tr) => {
+      console.log(tr);
       return Array.prototype.map.call(tr.querySelectorAll('td:not(.ignore),th:not(.ignore),.td:not(.ignore),.th:not(.ignore)'), (td) => {
         return this.sanitizeTD(td);
       });
     });
-
-    console.log(list);
 
     this.updateData({
       version: this.data.version + 1,
@@ -455,11 +483,11 @@ export class CompleteTable {
         selected: this.__selected
       });
 
-      // @ts-ignore
-      e.target.parentElement.classList.remove('editing');
-
-      // @ts-ignore
-      e.target.parentElement.innerHTML = e.target.value;
+      this.updateData({
+        version: this.data.version,
+        list: updates,
+        selected: this.__selected
+      });
     }
 
     return input;
@@ -467,8 +495,8 @@ export class CompleteTable {
 
   handleCellDoubleClick (e, value) {
     const item = e.target;
-    const row = parseInt(item.parentNode.dataset.index);
-    const column = parseInt(item.dataset.index);
+    const row = parseInt(item.dataset.row);
+    const column = parseInt(item.dataset.column);
 
     e.target.innerHTML = "";
 
@@ -508,15 +536,13 @@ export class CompleteTable {
   renderDragTab () {
     return (
       <div class="td small ignore">
-        <button class="drag-handle"></button>
+        <button class="drag-handle">☰</button>
       </div>
     );
   }
 
   renderSelectColumn (row: CompleteTableCell) {
-    console.log(row[0]);
     return (
-      // @ts-ignore
       <div class="td small ignore"><input type="checkbox" class="single" value={row[0].id} checked={this.valueSelected(row[0].id)} onChange={(e) => { this.handleSelectOne(e, row[0].id) }} /></div>
     );
   }
@@ -530,7 +556,9 @@ export class CompleteTable {
   renderHeaderHistoryColumn () {
     return (
       <div class="th">
-        <input type="number" value={this.data.version} onChange={ (e) => { this.handleVersionChange(e); } } />
+        <input type="number" readonly value={this.data.version} onChange={ (e) => { this.handleVersionChange(e); } } />
+        <button onClick={() => {this.undo()}} disabled={(this.data.version <= 1)}>undo</button>
+        <button onClick={() => {this.redo()}} disabled={(this.data.version >= this.__latestVersion && this.data.version === this.__latestVersion)}>redo</button>
       </div>
     );
   }
@@ -538,14 +566,11 @@ export class CompleteTable {
   renderHeaderSelectColumn () {
     if (this.pagination) {
       return (
-        // @ts-ignore
         <div class="th small ignore"></div>
       );
     } else {
-      return (
-        // @ts-ignore
-        <div class="th small ignore"><input type="checkbox" class="all" indeterminate={this.__selected.length !== this.data.list.length && this.__selected.length !== 0} checked={this.__selected.length === this.data.list.length} onChange={(e) => { this.handleSelectAll(e) }} /></div>
-      );
+      // @ts-ignore
+      return (<div class="th small ignore"><input type="checkbox" class="all" indeterminate={this.__selected.length !== this.data.list.length && this.__selected.length !== 0} checked={this.__selected.length === this.data.list.length} onChange={(e) => { this.handleSelectAll(e) }} /></div>);
     }
   }
 
@@ -583,33 +608,33 @@ export class CompleteTable {
   renderTableBody () {
     return (
       <div class="tbody">
-        { this.pagination && this.__currentPageItems && this.__currentPageItems.map((row, index) => {
-          return this.renderTableRow(row, index)
+        { this.pagination && this.__currentPageItems && this.__currentPageItems.map((row, rowIndex) => {
+          return this.renderTableRow(row, rowIndex)
         })}
-        { !this.pagination && this.data.list.map((row, index) => {
-          return this.renderTableRow(row, index)
+        { !this.pagination && this.data.list.map((row, rowIndex) => {
+          return this.renderTableRow(row, rowIndex)
         })}
       </div>
     )
   }
 
-  renderTableRow (row, index) {
+  renderTableRow (row, rowIndex) {
     const selected = (this.valueSelected(row[0].id)) ? 'selected' : '';
 
     return (
-      <div class={`tr ${selected}`} data-id={row[0].id} data-index={index} data-version={this.data.version}>
+      <div class={`tr ${selected}`} data-id={row[0].id} data-row={rowIndex} data-version={this.data.version}>
         { this.sortable && this.renderDragTab() }
         { this.selectable && this.renderSelectColumn(row) }
-        { row.map((item, index) => {
-          return this.renderTableCell(item, index)
+        { row.map((item, columnIndex) => {
+          return this.renderTableCell(item, columnIndex, rowIndex)
         }) }
       </div>
     )
   }
 
-  renderTableCell (item, index) {
+  renderTableCell (item, columnIndex, rowIndex) {
     return (
-     <div class="td" data-index={index} innerHTML={item.content} onDblClick={(e) => { this.handleCellDoubleClick(e, item.content); }}></div>
+     <div class="td" data-column={columnIndex} data-row={rowIndex} innerHTML={item.content} data-value={item.content} onDblClick={(e) => { this.handleCellDoubleClick(e, item.content); }}></div>
     )
   }
 
@@ -642,11 +667,11 @@ export class CompleteTable {
   render () {
     return (
       // @ts-ignore
-      <div class="table" name={this.__name}>
+      <div class="table" name={this.__name} tabindex="0">
         <div class="tr options">
-          { this.history && this.renderHeaderHistoryColumn() }
           { this.pagination && this.renderPageSelect() }
           { this.pagination && this.renderPageSelectNumber() }
+          { this.history && this.renderHeaderHistoryColumn() }
         </div>
 
         { this.renderTableHead() }
@@ -655,17 +680,4 @@ export class CompleteTable {
       </div>
     );
   }
-}
-
-interface CompleteTableCell {
-  content: string;
-  name?: string;
-  id?: string;
-  selected?: boolean;
-}
-
-interface CompleteTableDataModel {
-  version: number;
-  list: Array<Array<Object>>;
-  selected: Array<number>;
 }

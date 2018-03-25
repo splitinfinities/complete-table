@@ -1,6 +1,6 @@
 exports.config = {
   namespace: 'complete-table',
-  generateDistribution: true
+  outputTargets:[{type: 'dist'}, {type: 'www', serviceWorker: false}]
 };
 
 exports.devServer = {

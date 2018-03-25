@@ -17,19 +17,17 @@
     "test": "jest --no-cache",
     "test.watch": "jest --watch --no-cache"
   },
-  "dependencies": {
-    "@shopify/draggable": "^1.0.0-beta.4",
-    "@stencil/core": "0.4.0",
-    "deepmerge": "^2.0.1",
-    "dexie": "^2.0.1",
-    "is-plain-object": "^2.0.4",
-    "tabletojson": "^0.7.1"
-  },
   "devDependencies": {
+    "@stencil/core": "^0.7.7",
+    "@shopify/draggable": "^1.0.0-beta.4",
     "@stencil/dev-server": "latest",
     "@stencil/utils": "latest",
     "@types/jest": "^21.1.1",
-    "jest": "^21.2.1"
+    "deepmerge": "^2.0.1",
+    "dexie": "^2.0.1",
+    "is-plain-object": "^2.0.4",
+    "jest": "^21.2.1",
+    "tabletojson": "^0.7.1"
   },
   "repository": {
     "type": "git",

@@ -79,6 +79,19 @@ complete-table .table .thead .tr {
   text-align: center;
 }
 
+complete-table .table .thead .tr .th {
+  border-bottom: 1px solid var(--table-border-color);
+}
+
+complete-table .table .tr.options {
+  border-bottom: 1px solid var(--table-border-color);
+}
+
+complete-table .table .tr.options p {
+  margin: 0;
+}
+
+
 complete-table .table .thead .th,
 complete-table .table .thead .td {
   padding: 5px 5px;
@@ -450,6 +463,12 @@ body.draggable--is-dragging {
   cursor: -webkit-grabbing !important;
   cursor: grabbing !important;
   position: relative !important;
+}
+
+complete-table .table .drag-handle {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
 }
 
 complete-table .table .drag-handle:hover {
