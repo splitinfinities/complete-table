@@ -681,3 +681,18 @@ export class CompleteTable {
     );
   }
 }
+
+declare global {
+  interface CompleteTableCell {
+    content: string;
+    name?: string;
+    id?: string;
+    selected?: boolean;
+  }
+
+  interface CompleteTableDataModel {
+    version: number;
+    list: Array<Array<Object>>;
+    selected: Array<number>;
+  }
+}
