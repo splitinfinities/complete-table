@@ -128,6 +128,12 @@ export class CompleteTable {
    * Renders the editable HTML and prepares the editable behavior
    * @type {boolean}
    */
+  @Prop() name: string = "table";
+
+  /**
+   * Renders the editable HTML and prepares the editable behavior
+   * @type {boolean}
+   */
   @Prop() editable: boolean = false;
 
   /**
@@ -494,14 +500,16 @@ export class CompleteTable {
   }
 
   handleCellDoubleClick (e, value) {
-    const item = e.target;
-    const row = parseInt(item.dataset.row);
-    const column = parseInt(item.dataset.column);
+    if (this.editable) {
+      const item = e.target;
+      const row = parseInt(item.dataset.row);
+      const column = parseInt(item.dataset.column);
 
-    e.target.innerHTML = "";
+      e.target.innerHTML = "";
 
-    item.appendChild(this.createEditableItem(row, column, value));
-    item.classList.add('editing');
+      item.appendChild(this.createEditableItem(row, column, value));
+      item.classList.add('editing');
+    }
   }
 
   handleSelectOne(e, row_id) {
@@ -664,8 +672,31 @@ export class CompleteTable {
     });
   }
 
-  render () {
+  renderTable() {
     return (
+      <table id={this.name}>
+        <thead>
+          <tr>
+            { this.columns.map((cols: Array<any>) => {
+              return cols.map((cell) => {
+                return (<th>{cell.content}</th>)
+              })
+            }) }
+          </tr>
+        </thead>
+        <tbody>
+          { this.data.list.map((cols: Array<any>) => {
+            return <tr>{ cols.map((cell) => {
+              return (<td>{cell.content}</td>)
+            }) }</tr>
+          }) }
+        </tbody>
+      </table>
+    )
+  }
+
+  render () {
+    return [
       // @ts-ignore
       <div class="table" name={this.__name} tabindex="0">
         <div class="tr options">
@@ -677,7 +708,8 @@ export class CompleteTable {
         { this.renderTableHead() }
         { this.renderTableBody() }
         { this.selectable && this.renderSelectedItems() }
-      </div>
-    );
+      </div>,
+      this.renderTable()
+    ];
   }
 }

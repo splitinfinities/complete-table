@@ -51,6 +51,10 @@ declare global {
        */
       'items': number;
       /**
+       * Renders the editable HTML and prepares the editable behavior
+       */
+      'name': string;
+      /**
        * Renders the pagination HTML and prepares the pagination behavior
        */
       'pagination': boolean;
@@ -123,6 +127,10 @@ declare global {
        * Controls how many items are in the pagination
        */
       'items'?: number;
+      /**
+       * Renders the editable HTML and prepares the editable behavior
+       */
+      'name'?: string;
       /**
        * Renders the pagination HTML and prepares the pagination behavior
        */
