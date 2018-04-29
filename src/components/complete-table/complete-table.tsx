@@ -144,7 +144,7 @@ export class CompleteTable {
   @State() __resizableState: any;
 
   @State() columns: Array<Object> = [];
-  @State() data: CompleteTableDataModel = {
+  @State() data: { version: number; list: Array<Array<Object>>; selected: Array<number>; } = {
     version: 0,
     list: [],
     selected: []
@@ -447,13 +447,13 @@ export class CompleteTable {
     });
   }
 
-  sanitizeHeadTD (element: any): CompleteTableCell {
+  sanitizeHeadTD (element: any): { content: string; name?: string; id?: string; selected?: boolean; } {
     return {
       content: element.innerHTML
     }
   }
 
-  sanitizeTD (element: any): CompleteTableCell {
+  sanitizeTD (element: any): { content: string; name?: string; id?: string; selected?: boolean; } {
     return {
       content: element.innerHTML,
       id: element.parentNode.dataset.id,
@@ -541,7 +541,7 @@ export class CompleteTable {
     );
   }
 
-  renderSelectColumn (row: CompleteTableCell) {
+  renderSelectColumn (row: { content: string; name?: string; id?: string; selected?: boolean; }) {
     return (
       <div class="td small ignore"><input type="checkbox" class="single" value={row[0].id} checked={this.valueSelected(row[0].id)} onChange={(e) => { this.handleSelectOne(e, row[0].id) }} /></div>
     );
@@ -679,20 +679,5 @@ export class CompleteTable {
         { this.selectable && this.renderSelectedItems() }
       </div>
     );
-  }
-}
-
-declare global {
-  interface CompleteTableCell {
-    content: string;
-    name?: string;
-    id?: string;
-    selected?: boolean;
-  }
-
-  interface CompleteTableDataModel {
-    version: number;
-    list: Array<Array<Object>>;
-    selected: Array<number>;
   }
 }

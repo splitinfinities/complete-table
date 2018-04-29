@@ -72,7 +72,7 @@ declare global {
        * Renders the sortable HTML and prepares sortable behavior
        */
       'sortable': boolean;
-      'state': () => { columns: Object[]; data: CompleteTableDataModel; selected: number[]; };
+      'state': () => { columns: Object[]; data: { version: number; list: Object[][]; selected: number[]; }; selected: number[]; };
       /**
        * Responsible for making the .thead sticky.
        */
