@@ -2,11 +2,11 @@
   "namespace": "CompleteTable",
   "fsNamespace": "complete-table",
   "loader": "../complete-table.js",
-  "corePolyfilled": "es5-build-disabled.js",
-  "core": "complete-table.core.js",
+  "core": "complete-table.7mrfejtu.js",
+  "corePolyfilled": "complete-table.b4xwcyns.js",
   "components": {
     "complete-table": {
-      "$": "complete-table"
+      "$": "qdkmo58n"
     }
   }
 }

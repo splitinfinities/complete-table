@@ -18,8 +18,8 @@
     "test.watch": "jest --watch --no-cache"
   },
   "devDependencies": {
-    "@stencil/core": "^0.7.7",
     "@shopify/draggable": "^1.0.0-beta.4",
+    "@stencil/core": "^0.7.26",
     "@stencil/dev-server": "latest",
     "@stencil/utils": "latest",
     "@types/jest": "^21.1.1",
@@ -51,5 +51,8 @@
       "json",
       "jsx"
     ]
+  },
+  "dependencies": {
+    "@types/node": "^9.6.7"
   }
 }

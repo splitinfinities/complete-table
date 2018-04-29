@@ -25,59 +25,65 @@ declare global {
 
 
 declare global {
-  interface HTMLCompleteTableElement extends HTMLStencilElement {
-    /**
-     * Renders the density HTML and prepares the density behavior
-     */
-    'density': string|"comfortable"|"cozy"|"compact";
-    /**
-     * Renders the editable HTML and prepares the editable behavior
-     */
-    'editable': boolean;
-    'expandInto': string|"row"|"side-panel"|"dialog";
-    'expandable': boolean;
-    /**
-     * Renders the filterable HTML and prepares the filterable behavior
-     */
-    'filterable': boolean;
-    /**
-     * Renders the history HTML and prepares the history behavior
-     */
-    'history': boolean;
-    /**
-     * Controls how many items are in the pagination
-     */
-    'items': number;
-    /**
-     * Renders the pagination HTML and prepares the pagination behavior
-     */
-    'pagination': boolean;
-    /**
-     * Renders the readability HTML and prepares the readability behavior
-     */
-    'readability': string|"border"|"even"|"odd";
-    'redo': () => void;
-    /**
-     * Renders the resizable HTML and prepares the resizable behavior
-     */
-    'resizable': boolean;
-    'searchable': boolean;
-    /**
-     * Renders the selectable HTML and prepared the selectable behavior
-     */
-    'selectable': boolean;
-    /**
-     * Renders the sortable HTML and prepares sortable behavior
-     */
-    'sortable': boolean;
-    'state': () => { columns: Object[]; data: CompleteTableDataModel; selected: number[]; };
-    /**
-     * Responsible for making the .thead sticky.
-     */
-    'sticky': boolean;
-    'undo': () => void;
-    'updateData': (data: any) => void;
+
+  namespace StencilComponents {
+    interface CompleteTable {
+      /**
+       * Renders the density HTML and prepares the density behavior
+       */
+      'density': string|"comfortable"|"cozy"|"compact";
+      /**
+       * Renders the editable HTML and prepares the editable behavior
+       */
+      'editable': boolean;
+      'expandInto': string|"row"|"side-panel"|"dialog";
+      'expandable': boolean;
+      /**
+       * Renders the filterable HTML and prepares the filterable behavior
+       */
+      'filterable': boolean;
+      /**
+       * Renders the history HTML and prepares the history behavior
+       */
+      'history': boolean;
+      /**
+       * Controls how many items are in the pagination
+       */
+      'items': number;
+      /**
+       * Renders the pagination HTML and prepares the pagination behavior
+       */
+      'pagination': boolean;
+      /**
+       * Renders the readability HTML and prepares the readability behavior
+       */
+      'readability': string|"border"|"even"|"odd";
+      'redo': () => void;
+      /**
+       * Renders the resizable HTML and prepares the resizable behavior
+       */
+      'resizable': boolean;
+      'searchable': boolean;
+      /**
+       * Renders the selectable HTML and prepared the selectable behavior
+       */
+      'selectable': boolean;
+      /**
+       * Renders the sortable HTML and prepares sortable behavior
+       */
+      'sortable': boolean;
+      'state': () => { columns: Object[]; data: CompleteTableDataModel; selected: number[]; };
+      /**
+       * Responsible for making the .thead sticky.
+       */
+      'sticky': boolean;
+      'undo': () => void;
+      'updateData': (data: any) => void;
+    }
   }
+
+  interface HTMLCompleteTableElement extends StencilComponents.CompleteTable, HTMLStencilElement {}
+
   var HTMLCompleteTableElement: {
     prototype: HTMLCompleteTableElement;
     new (): HTMLCompleteTableElement;
