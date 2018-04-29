@@ -1,6 +1,6 @@
 {
   "name": "complete-table",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Stencil Component Starter",
   "main": "dist/complete-table.js",
   "types": "dist/types/index.d.ts",
